@@ -44,12 +44,12 @@ class ContractStatusEnum(enum.Enum):
 
 class PackagingStatusEnum(enum.Enum):
     PENDING = "Pending"
-    PACKED = "Packed"
+    COMPLETED = "Completed"
 
 
 class ShippingStatusEnum(enum.Enum):
     PENDING = "Pending"
-    SHIPPED = "Shipped"
+    SHIPPING = "Shipping"
     DELIVERED = "Delivered"
 
 
@@ -254,3 +254,43 @@ class Notification(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+# =====================
+# AUDIT LOG
+# =====================
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
+
+    action = Column(
+        String,
+        nullable=False
+    )
+
+    entity = Column(
+        String,
+        nullable=False
+    )
+
+    entity_id = Column(
+        Integer,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    user = relationship("User")

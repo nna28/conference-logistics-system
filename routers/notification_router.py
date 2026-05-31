@@ -64,6 +64,41 @@ def get_notification(
 
     return notification
 
+@router.get(
+    "/unread",
+    response_model=list[NotificationResponse]
+)
+def get_unread_notifications(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    )
+):
+    return db.query(Notification).filter(
+        Notification.receiver_id ==
+        current_user.id,
+        Notification.is_read == False
+    ).order_by(
+        Notification.created_at.desc()
+    ).all()
+
+@router.get("/unread-count")
+def unread_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    )
+):
+    count = db.query(Notification).filter(
+        Notification.receiver_id ==
+        current_user.id,
+        Notification.is_read == False
+    ).count()
+
+    return {
+        "unread_count": count
+    }
+
 @router.post(
     "/",
     response_model=NotificationResponse
@@ -97,6 +132,62 @@ def create_notification(
     db.refresh(notification)
 
     return notification
+
+@router.put(
+    "/{notification_id}/read"
+)
+def mark_as_read(
+    notification_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    )
+):
+    notification = db.query(
+        Notification
+    ).filter(
+        Notification.id == notification_id,
+        Notification.receiver_id ==
+        current_user.id
+    ).first()
+
+    if not notification:
+        raise HTTPException(
+            status_code=404,
+            detail="Notification not found"
+        )
+
+    notification.is_read = True
+
+    db.commit()
+
+    return {
+        "message": "Notification marked as read"
+    }
+
+@router.put("/read-all")
+def mark_all_read(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    )
+):
+    notifications = db.query(
+        Notification
+    ).filter(
+        Notification.receiver_id ==
+        current_user.id,
+        Notification.is_read == False
+    ).all()
+
+    for notification in notifications:
+        notification.is_read = True
+
+    db.commit()
+
+    return {
+        "message": "All notifications marked as read"
+    }
 
 @router.put(
     "/{notification_id}",

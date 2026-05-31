@@ -1,4 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query
+)
 from sqlalchemy.orm import Session
 
 from db.database import get_db
@@ -12,7 +17,7 @@ from schemas.venue_schema import (
     VenueResponse
 )
 
-from core.dependencies import require_role
+from core.dependencies import get_current_user, require_role
 
 router = APIRouter(
     prefix="/venues",
@@ -40,15 +45,10 @@ def get_venues(
 def search_venues(
     capacity: int | None = None,
     room_type: str | None = None,
-    max_cost: float | None = None,
+    is_available: bool | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_role(
-            "Admin",
-            "Booking Staff",
-            "Logistics Coordinator",
-            "Sales Manager"
-        )
+        get_current_user
     )
 ):
     query = db.query(Venue)
@@ -60,14 +60,13 @@ def search_venues(
 
     if room_type:
         query = query.filter(
-            Venue.room_type.ilike(
-                f"%{room_type}%"
-            )
+            Venue.room_type == room_type
         )
 
-    if max_cost:
+    if is_available is not None:
         query = query.filter(
-            Venue.rental_cost <= max_cost
+            Venue.is_available ==
+            is_available
         )
 
     return query.all()

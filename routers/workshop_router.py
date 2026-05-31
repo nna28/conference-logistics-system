@@ -13,6 +13,7 @@ from schemas.workshop_schema import (
 )
 
 from core.dependencies import require_role
+from core.audit import create_audit_log
 
 router = APIRouter(
     prefix="/workshops",
@@ -96,6 +97,14 @@ def create_workshop(
     db.commit()
     db.refresh(workshop)
 
+    create_audit_log(
+        db=db,
+        user_id=current_user.id,
+        action="Create",
+        entity="Workshop",
+        entity_id=workshop.id
+    )
+    
     return workshop
 
 @router.put(

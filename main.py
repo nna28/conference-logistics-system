@@ -11,6 +11,8 @@ from routers.contract_router import router as contract_router
 from routers.flight_router import router as flight_router
 from routers.material_router import router as material_router
 from routers.notification_router import router as notification_router
+from routers.dashboard_router import router as dashboard_router
+from routers.audit_router import router as audit_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -26,6 +28,8 @@ app.include_router(contract_router)
 app.include_router(flight_router)
 app.include_router(material_router)
 app.include_router(notification_router)
+app.include_router(dashboard_router)
+app.include_router(audit_router)
 
 @app.get("/")
 def root():
