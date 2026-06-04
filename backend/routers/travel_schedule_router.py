@@ -20,7 +20,8 @@ from services.audit_service import (
 )
 
 from core.dependencies import (
-    get_current_user
+    get_current_user,
+    require_role
 )
 
 router = APIRouter(
@@ -31,19 +32,35 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=list[TravelScheduleResponse]
+    response_model=list[TravelScheduleResponse],
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Training Consultant",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_travel_schedules(
     db: Session = Depends(get_db)
 ):
-    return db.query(
-        TravelSchedule
-    ).all()
+    return db.query(TravelSchedule).all()
 
 
 @router.get(
     "/{schedule_id}",
-    response_model=TravelScheduleResponse
+    response_model=TravelScheduleResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Training Consultant",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_travel_schedule(
     schedule_id: int,
@@ -64,7 +81,18 @@ def get_travel_schedule(
     return schedule
 
 
-@router.get("/{schedule_id}/overview")
+@router.get(
+    "/{schedule_id}/overview",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Training Consultant",
+                "Logistics Coordinator"
+            )
+        )
+    ]
+)
 def get_travel_schedule_overview(
     schedule_id: int,
     db: Session = Depends(get_db)
@@ -87,22 +115,30 @@ def get_travel_schedule_overview(
         Workshop.id == schedule.workshop_id
     ).first()
 
-    consultant = db.query(
+    trainer = db.query(
         User
     ).filter(
-        User.id == schedule.consultant_id
+        User.id == schedule.trainer_id
     ).first()
 
     return {
         "travel_schedule": schedule,
         "workshop": workshop,
-        "consultant": consultant
+        "trainer": trainer
     }
 
 
 @router.post(
     "/",
-    response_model=TravelScheduleResponse
+    response_model=TravelScheduleResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def create_travel_schedule(
     request: TravelScheduleCreate,
@@ -123,21 +159,21 @@ def create_travel_schedule(
             detail="Workshop not found"
         )
 
-    consultant = db.query(
+    trainer = db.query(
         User
     ).filter(
-        User.id == request.consultant_id
+        User.id == request.trainer_id
     ).first()
 
-    if not consultant:
+    if not trainer:
         raise HTTPException(
             status_code=404,
-            detail="Consultant not found"
+            detail="Trainer not found"
         )
 
     schedule = TravelSchedule(
         workshop_id=request.workshop_id,
-        consultant_id=request.consultant_id,
+        trainer_id=request.trainer_id,
         transport_type=request.transport_type,
         departure_location=request.departure_location,
         destination=request.destination,
@@ -146,9 +182,7 @@ def create_travel_schedule(
     )
 
     db.add(schedule)
-
     db.commit()
-
     db.refresh(schedule)
 
     create_audit_log(
@@ -163,7 +197,15 @@ def create_travel_schedule(
 
 @router.put(
     "/{schedule_id}",
-    response_model=TravelScheduleResponse
+    response_model=TravelScheduleResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def update_travel_schedule(
     schedule_id: int,
@@ -190,14 +232,9 @@ def update_travel_schedule(
     )
 
     for key, value in update_data.items():
-        setattr(
-            schedule,
-            key,
-            value
-        )
+        setattr(schedule, key, value)
 
     db.commit()
-
     db.refresh(schedule)
 
     create_audit_log(
@@ -210,7 +247,16 @@ def update_travel_schedule(
     return schedule
 
 
-@router.delete("/{schedule_id}")
+@router.delete(
+    "/{schedule_id}",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin"
+            )
+        )
+    ]
+)
 def delete_travel_schedule(
     schedule_id: int,
     db: Session = Depends(get_db),
@@ -231,14 +277,13 @@ def delete_travel_schedule(
         )
 
     create_audit_log(
-            db,
-            current_user.id,
-            "DELETE",
-            f"Travel Schedule #{schedule.id}"
-        )
+        db,
+        current_user.id,
+        "DELETE",
+        f"Travel Schedule #{schedule.id}"
+    )
 
     db.delete(schedule)
-
     db.commit()
 
     return {

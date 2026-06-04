@@ -20,7 +20,8 @@ from services.audit_service import (
 )
 
 from core.dependencies import (
-    get_current_user
+    get_current_user,
+    require_role
 )
 
 router = APIRouter(
@@ -31,7 +32,16 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=list[MaterialRequestResponse]
+    response_model=list[MaterialRequestResponse],
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_material_requests(
     db: Session = Depends(get_db)
@@ -43,39 +53,59 @@ def get_material_requests(
 
 @router.get(
     "/{request_id}",
-    response_model=MaterialRequestResponse
+    response_model=MaterialRequestResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_material_request(
     request_id: int,
     db: Session = Depends(get_db)
 ):
-    request = db.query(
+    material_request = db.query(
         MaterialRequest
     ).filter(
         MaterialRequest.id == request_id
     ).first()
 
-    if not request:
+    if not material_request:
         raise HTTPException(
             status_code=404,
             detail="Material request not found"
         )
 
-    return request
+    return material_request
 
 
-@router.get("/{request_id}/overview")
+@router.get(
+    "/{request_id}/overview",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
+)
 def get_material_request_overview(
     request_id: int,
     db: Session = Depends(get_db)
 ):
-    request = db.query(
+    material_request = db.query(
         MaterialRequest
     ).filter(
         MaterialRequest.id == request_id
     ).first()
 
-    if not request:
+    if not material_request:
         raise HTTPException(
             status_code=404,
             detail="Material request not found"
@@ -84,18 +114,26 @@ def get_material_request_overview(
     workshop = db.query(
         Workshop
     ).filter(
-        Workshop.id == request.workshop_id
+        Workshop.id == material_request.workshop_id
     ).first()
 
     return {
-        "material_request": request,
+        "material_request": material_request,
         "workshop": workshop
     }
 
 
 @router.post(
     "/",
-    response_model=MaterialRequestResponse
+    response_model=MaterialRequestResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def create_material_request(
     request: MaterialRequestCreate,
@@ -121,7 +159,7 @@ def create_material_request(
         quantity_needed=request.quantity_needed,
         packaging_status=request.packaging_status or "Pending",
         shipping_status=request.shipping_status or "Pending",
-        shipping_date=request.shipping_date,
+        shipping_date=request.shipping_date
     )
 
     db.add(material_request)
@@ -142,7 +180,15 @@ def create_material_request(
 
 @router.put(
     "/{request_id}",
-    response_model=MaterialRequestResponse
+    response_model=MaterialRequestResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def update_material_request(
     request_id: int,
@@ -189,7 +235,17 @@ def update_material_request(
     return material_request
 
 
-@router.delete("/{request_id}")
+@router.delete(
+    "/{request_id}",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
+)
 def delete_material_request(
     request_id: int,
     db: Session = Depends(get_db),

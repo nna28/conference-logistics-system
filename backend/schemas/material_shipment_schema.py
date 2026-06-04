@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 
+from models.models import (
+    PackagingStatusEnum,
+    ShippingStatusEnum
+)
 
 class MaterialShipmentCreate(BaseModel):
     material_request_id: int
@@ -8,8 +12,8 @@ class MaterialShipmentCreate(BaseModel):
 
 
 class MaterialShipmentUpdate(BaseModel):
-    packaging_status: str | None = None
-    shipping_status: str | None = None
+    packaging_status: PackagingStatusEnum | None = None
+    shipping_status: ShippingStatusEnum | None = None
 
 
 class MaterialShipmentResponse(BaseModel):
@@ -17,8 +21,8 @@ class MaterialShipmentResponse(BaseModel):
     material_request_id: int
     material_id: int
     quantity: int
-    packaging_status: str
-    shipping_status: str
+    packaging_status: PackagingStatusEnum
+    shipping_status: ShippingStatusEnum
 
     class Config:
         from_attributes = True

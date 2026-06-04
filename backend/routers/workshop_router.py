@@ -10,7 +10,9 @@ from models.models import (
     Venue,
     TravelSchedule,
     MaterialRequest,
-    MaterialShipment
+    MaterialShipment,
+    Notification,
+    RoleEnum
 )
 
 from schemas.workshop_schema import (
@@ -28,6 +30,8 @@ from core.dependencies import (
     require_role
 )
 
+from datetime import datetime, timezone
+
 router = APIRouter(
     prefix="/workshops",
     tags=["Workshops"]
@@ -37,20 +41,36 @@ router = APIRouter(
 @router.get(
     "/",
     response_model=list[WorkshopResponse],
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff",
+                "Training Consultant",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_workshops(
     db: Session = Depends(get_db)
 ):
-    return db.query(
-        Workshop
-    ).all()
+    return db.query(Workshop).all()
 
 
 @router.get(
     "/{workshop_id}",
     response_model=WorkshopResponse,
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff",
+                "Training Consultant",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_workshop(
     workshop_id: int,
@@ -73,7 +93,16 @@ def get_workshop(
 
 @router.get(
     "/{workshop_id}/overview",
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff",
+                "Training Consultant",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_workshop_overview(
     workshop_id: int,
@@ -91,29 +120,24 @@ def get_workshop_overview(
             detail="Workshop not found"
         )
 
-    consultant = db.query(
-        User
-    ).filter(
-        User.id ==
-        workshop.trainer_id
-    ).first()
+    trainer = None
+
+    if workshop.trainer_id:
+        trainer = db.query(User).filter(
+            User.id == workshop.trainer_id
+        ).first()
 
     contracts = db.query(
         Contract
     ).filter(
-        Contract.workshop_id ==
-        workshop.id
+        Contract.workshop_id == workshop.id
     ).all()
 
     venues = []
 
     for contract in contracts:
-
-        venue = db.query(
-            Venue
-        ).filter(
-            Venue.id ==
-            contract.venue_id
+        venue = db.query(Venue).filter(
+            Venue.id == contract.venue_id
         ).first()
 
         if venue:
@@ -122,27 +146,24 @@ def get_workshop_overview(
     travel_schedules = db.query(
         TravelSchedule
     ).filter(
-        TravelSchedule.workshop_id ==
-        workshop.id
+        TravelSchedule.workshop_id == workshop.id
     ).all()
 
     material_requests = db.query(
         MaterialRequest
     ).filter(
-        MaterialRequest.workshop_id ==
-        workshop.id
+        MaterialRequest.workshop_id == workshop.id
     ).all()
 
     shipments = []
 
-    for request in material_requests:
+    for material_request in material_requests:
 
         shipment_list = db.query(
             MaterialShipment
         ).filter(
-            MaterialShipment.material_request_id
-            ==
-            request.id
+            MaterialShipment.material_request_id ==
+            material_request.id
         ).all()
 
         shipments.extend(
@@ -150,80 +171,109 @@ def get_workshop_overview(
         )
 
     return {
-        "workshop":
-            workshop,
-
-        "consultant":
-            consultant,
-
-        "contracts":
-            contracts,
-
-        "venues":
-            venues,
-
-        "travel_schedules":
-            travel_schedules,
-
-        "material_requests":
-            material_requests,
-
-        "shipments":
-            shipments
+        "workshop": workshop,
+        "trainer": trainer,
+        "contracts": contracts,
+        "venues": venues,
+        "travel_schedules": travel_schedules,
+        "material_requests": material_requests,
+        "shipments": shipments
     }
 
 
 @router.post(
     "/{workshop_id}/notify-logistics",
-    dependencies=[Depends(require_role("Admin", "Booking Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff"
+            )
+        )
+    ]
 )
 def notify_logistics(
     workshop_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(
+        get_current_user
+    )
 ):
-    workshop = db.query(Workshop).filter(Workshop.id == workshop_id).first()
+    workshop = db.query(
+        Workshop
+    ).filter(
+        Workshop.id == workshop_id
+    ).first()
+
     if not workshop:
-        raise HTTPException(status_code=404, detail="Workshop not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Workshop not found"
+        )
 
-    logistics_users = db.query(User).filter(User.role == "Logistics Coordinator").all()
+    logistics_users = db.query(
+        User
+    ).filter(
+        User.role == RoleEnum.LOGISTICS_COORDINATOR
+    ).all()
+
     if not logistics_users:
-        raise HTTPException(status_code=404, detail="No Logistics Coordinator found")
+        raise HTTPException(
+            status_code=404,
+            detail="No Logistics Coordinator found"
+        )
 
-    from models.models import Notification
-    from datetime import datetime, timezone
-    
-    city = workshop.city or "Unknown City"
-    w_type = workshop.workshop_type or "Unknown Type"
-    date = str(workshop.scheduled_time) if workshop.scheduled_time else "Unknown Date"
-    
-    consultant_name = "Unknown Consultant"
-    if workshop.consultant_id:
-        c_user = db.query(User).filter(User.id == workshop.consultant_id).first()
-        if c_user:
-            consultant_name = c_user.full_name
+    trainer_name = "Unknown Trainer"
 
-    msg = f"Seminar: {w_type}\nDate: {date}\nCity: {city}\nConsultant: {consultant_name}"
+    if workshop.trainer_id:
+        trainer = db.query(User).filter(
+            User.id == workshop.trainer_id
+        ).first()
 
-    for l_user in logistics_users:
+        if trainer:
+            trainer_name = trainer.full_name
+
+    message = (
+        f"Workshop Type: {workshop.workshop_type}\n"
+        f"Date: {workshop.scheduled_time}\n"
+        f"City: {workshop.city}\n"
+        f"Trainer: {trainer_name}"
+    )
+
+    for logistics_user in logistics_users:
+
         notification = Notification(
             sender_id=current_user.id,
-            receiver_id=l_user.id,
-            title=f"New Workshop Alert: {workshop.workshop_code}",
-            message=msg,
+            receiver_id=logistics_user.id,
+            title=f"Workshop Alert: {workshop.workshop_code}",
+            message=message,
             is_read=False,
-            created_at=datetime.now(timezone.utc)
+            created_at=datetime.now(
+                timezone.utc
+            )
         )
+
         db.add(notification)
-        
+
     db.commit()
-    return {"message": "Logistics Coordinators notified successfully."}
+
+    return {
+        "message":
+        "Logistics Coordinators notified successfully"
+    }
 
 
 @router.post(
     "/",
     response_model=WorkshopResponse,
-    dependencies=[Depends(require_role("Admin", "Booking Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff"
+            )
+        )
+    ]
 )
 def create_workshop(
     request: WorkshopCreate,
@@ -261,7 +311,14 @@ def create_workshop(
 @router.put(
     "/{workshop_id}",
     response_model=WorkshopResponse,
-    dependencies=[Depends(require_role("Admin", "Booking Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff"
+            )
+        )
+    ]
 )
 def update_workshop(
     workshop_id: int,
@@ -310,7 +367,13 @@ def update_workshop(
 
 @router.delete(
     "/{workshop_id}",
-    dependencies=[Depends(require_role("Admin", "Booking Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin"
+            )
+        )
+    ]
 )
 def delete_workshop(
     workshop_id: int,
@@ -330,7 +393,7 @@ def delete_workshop(
             status_code=404,
             detail="Workshop not found"
         )
-    
+
     create_audit_log(
         db,
         current_user.id,

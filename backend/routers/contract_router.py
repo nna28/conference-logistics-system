@@ -21,7 +21,8 @@ from services.audit_service import (
 )
 
 from core.dependencies import (
-    get_current_user
+    get_current_user,
+    require_role
 )
 
 router = APIRouter(
@@ -32,7 +33,16 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=list[ContractResponse]
+    response_model=list[ContractResponse],
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Sales Manager",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_contracts(
     db: Session = Depends(get_db)
@@ -44,7 +54,16 @@ def get_contracts(
 
 @router.get(
     "/{contract_id}",
-    response_model=ContractResponse
+    response_model=ContractResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Sales Manager",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_contract(
     contract_id: int,
@@ -65,7 +84,18 @@ def get_contract(
     return contract
 
 
-@router.get("/{contract_id}/overview")
+@router.get(
+    "/{contract_id}/overview",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Sales Manager",
+                "Logistics Coordinator"
+            )
+        )
+    ]
+)
 def get_contract_overview(
     contract_id: int,
     db: Session = Depends(get_db)
@@ -103,7 +133,16 @@ def get_contract_overview(
 
 @router.post(
     "/",
-    response_model=ContractResponse
+    response_model=ContractResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Sales Manager",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def create_contract(
     request: ContractCreate,
@@ -140,10 +179,11 @@ def create_contract(
         workshop_id=request.workshop_id,
         venue_id=request.venue_id,
         sales_manager_id=request.sales_manager_id,
-        status=request.status or "Draft",
+        status=request.status or "Pending",
         meeting_rooms=request.meeting_rooms,
         seating_style=request.seating_style,
         av_requirements=request.av_requirements,
+        revision_notes=request.revision_notes
     )
 
     db.add(contract)
@@ -164,7 +204,16 @@ def create_contract(
 
 @router.put(
     "/{contract_id}",
-    response_model=ContractResponse
+    response_model=ContractResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Sales Manager",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def update_contract(
     contract_id: int,
@@ -211,7 +260,16 @@ def update_contract(
     return contract
 
 
-@router.delete("/{contract_id}")
+@router.delete(
+    "/{contract_id}",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin"
+            )
+        )
+    ]
+)
 def delete_contract(
     contract_id: int,
     db: Session = Depends(get_db),

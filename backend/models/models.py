@@ -1,3 +1,5 @@
+import enum
+
 from sqlalchemy import (
     Column,
     Integer,
@@ -5,7 +7,8 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Text,
-    Boolean
+    Boolean,
+    Enum
 )
 
 from sqlalchemy.orm import relationship
@@ -13,31 +16,108 @@ from sqlalchemy.orm import relationship
 from db.database import Base
 
 
+# ==================================================
+# ENUMS
+# ==================================================
+
+class RoleEnum(enum.Enum):
+    ADMIN = "Admin"
+    LOGISTICS_COORDINATOR = "Logistics Coordinator"
+    BOOKING_STAFF = "Booking Staff"
+    SALES_MANAGER = "Sales Manager"
+    TRAINING_CONSULTANT = "Training Consultant"
+    MATERIALS_HANDLING_STAFF = "Materials Handling Staff"
+
+
+class WorkshopStatusEnum(enum.Enum):
+    PENDING = "Pending"
+    PROCESSING = "Processing"
+    COMPLETED = "Completed"
+
+
+class ContractStatusEnum(enum.Enum):
+    PENDING = "Pending"
+    EDITING = "Editing"
+    APPROVED = "Approved"
+    COMPLETED = "Completed"
+
+
+class PackagingStatusEnum(enum.Enum):
+    PENDING = "Pending"
+    COMPLETED = "Completed"
+
+
+class ShippingStatusEnum(enum.Enum):
+    PENDING = "Pending"
+    SHIPPING = "Shipping"
+    DELIVERED = "Delivered"
+
+
+class ConfirmationStatusEnum(enum.Enum):
+    PENDING = "Pending"
+    CONFIRMED = "Confirmed"
+    CANCELLED = "Cancelled"
+
+
+class MaterialTypeEnum(enum.Enum):
+    TRAINING_MATERIAL = "Training Material"
+    PROMOTIONAL_MATERIAL = "Promotional Material"
+    PARTICIPANT_GIFT = "Participant Gift"
+
+
+# ==================================================
+# USER
+# ==================================================
+
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
 
-    full_name = Column(String)
+    full_name = Column(
+        String,
+        nullable=False
+    )
 
     username = Column(
         String,
-        unique=True
+        unique=True,
+        nullable=False
     )
 
-    hashed_password = Column(String)
+    hashed_password = Column(
+        String,
+        nullable=False
+    )
 
-    role = Column(String)
+    role = Column(
+        Enum(RoleEnum),
+        nullable=False
+    )
 
-    is_active = Column(Integer, default=1)
+    is_active = Column(
+        Boolean,
+        default=True
+    )
 
+    created_at = Column(DateTime)
+
+    updated_at = Column(DateTime)
+
+
+# ==================================================
+# WORKSHOP
+# ==================================================
 
 class Workshop(Base):
     __tablename__ = "workshops"
 
     id = Column(Integer, primary_key=True)
 
-    workshop_code = Column(String, unique=True)
+    workshop_code = Column(
+        String,
+        unique=True
+    )
 
     workshop_type = Column(String)
 
@@ -48,8 +128,8 @@ class Workshop(Base):
     city = Column(String)
 
     status = Column(
-        String,
-        default="Pending"
+        Enum(WorkshopStatusEnum),
+        default=WorkshopStatusEnum.PENDING
     )
 
     trainer_id = Column(
@@ -57,8 +137,15 @@ class Workshop(Base):
         ForeignKey("users.id")
     )
 
-    consultant = relationship("User", foreign_keys=[trainer_id])
+    training_consultant = relationship(
+        "User",
+        foreign_keys=[trainer_id]
+    )
 
+
+# ==================================================
+# VENUE
+# ==================================================
 
 class Venue(Base):
     __tablename__ = "venues"
@@ -75,10 +162,17 @@ class Venue(Base):
 
     equipment_supported = Column(String)
 
-    is_available = Column(Integer, default=1)
+    is_available = Column(
+        Boolean,
+        default=True
+    )
 
     capacity = Column(Integer)
 
+
+# ==================================================
+# CONTRACT
+# ==================================================
 
 class Contract(Base):
     __tablename__ = "contracts"
@@ -101,11 +195,15 @@ class Contract(Base):
     )
 
     status = Column(
-        String,
-        default="Draft"
+        Enum(ContractStatusEnum),
+        default=ContractStatusEnum.PENDING
     )
 
     created_at = Column(DateTime)
+
+    updated_at = Column(DateTime)
+
+    approved_at = Column(DateTime)
 
     meeting_rooms = Column(Integer)
 
@@ -115,18 +213,21 @@ class Contract(Base):
 
     revision_notes = Column(Text)
 
-    updated_at = Column(DateTime)
-
     pending_review_by = Column(String)
-
-    approved_at = Column(DateTime)
 
     workshop = relationship("Workshop")
 
     venue = relationship("Venue")
 
-    sales_manager = relationship("User", foreign_keys=[sales_manager_id])
+    sales_manager = relationship(
+        "User",
+        foreign_keys=[sales_manager_id]
+    )
 
+
+# ==================================================
+# TRAVEL SCHEDULE
+# ==================================================
 
 class TravelSchedule(Base):
     __tablename__ = "travel_schedules"
@@ -138,7 +239,7 @@ class TravelSchedule(Base):
         ForeignKey("workshops.id")
     )
 
-    consultant_id = Column(
+    trainer_id = Column(
         Integer,
         ForeignKey("users.id")
     )
@@ -154,16 +255,23 @@ class TravelSchedule(Base):
     travel_info = Column(Text)
 
     status = Column(
-        String,
-        default="Pending"
+        Enum(ConfirmationStatusEnum),
+        default=ConfirmationStatusEnum.PENDING
     )
 
     confirmation_file = Column(String)
 
     workshop = relationship("Workshop")
 
-    consultant = relationship("User")
+    consultant = relationship(
+        "User",
+        foreign_keys=[trainer_id]
+    )
 
+
+# ==================================================
+# MATERIAL
+# ==================================================
 
 class Material(Base):
     __tablename__ = "materials"
@@ -175,16 +283,30 @@ class Material(Base):
         ForeignKey("workshops.id")
     )
 
+    material_type = Column(
+        Enum(MaterialTypeEnum)
+    )
+
     quantity_needed = Column(Integer)
 
-    packaging_status = Column(String, default="Pending")
+    packaging_status = Column(
+        Enum(PackagingStatusEnum),
+        default=PackagingStatusEnum.PENDING
+    )
 
-    shipping_status = Column(String, default="Pending")
+    shipping_status = Column(
+        Enum(ShippingStatusEnum),
+        default=ShippingStatusEnum.PENDING
+    )
 
     shipping_date = Column(DateTime)
 
     workshop = relationship("Workshop")
 
+
+# ==================================================
+# MATERIAL REQUEST
+# ==================================================
 
 class MaterialRequest(Base):
     __tablename__ = "material_requests"
@@ -196,11 +318,21 @@ class MaterialRequest(Base):
         ForeignKey("workshops.id")
     )
 
+    material_type = Column(
+        Enum(MaterialTypeEnum)
+    )
+
     quantity_needed = Column(Integer)
 
-    packaging_status = Column(String, default="Pending")
+    packaging_status = Column(
+        Enum(PackagingStatusEnum),
+        default=PackagingStatusEnum.PENDING
+    )
 
-    shipping_status = Column(String, default="Pending")
+    shipping_status = Column(
+        Enum(ShippingStatusEnum),
+        default=ShippingStatusEnum.PENDING
+    )
 
     shipping_date = Column(DateTime)
 
@@ -208,6 +340,10 @@ class MaterialRequest(Base):
 
     workshop = relationship("Workshop")
 
+
+# ==================================================
+# MATERIAL SHIPMENT
+# ==================================================
 
 class MaterialShipment(Base):
     __tablename__ = "material_shipments"
@@ -227,13 +363,13 @@ class MaterialShipment(Base):
     quantity = Column(Integer)
 
     packaging_status = Column(
-        String,
-        default="Pending"
+        Enum(PackagingStatusEnum),
+        default=PackagingStatusEnum.PENDING
     )
 
     shipping_status = Column(
-        String,
-        default="Pending"
+        Enum(ShippingStatusEnum),
+        default=ShippingStatusEnum.PENDING
     )
 
     material_request = relationship(
@@ -244,6 +380,10 @@ class MaterialShipment(Base):
         "Material"
     )
 
+
+# ==================================================
+# NOTIFICATION
+# ==================================================
 
 class Notification(Base):
     __tablename__ = "notifications"
@@ -271,9 +411,20 @@ class Notification(Base):
 
     created_at = Column(DateTime)
 
-    sender = relationship("User", foreign_keys=[sender_id])
-    receiver = relationship("User", foreign_keys=[receiver_id])
+    sender = relationship(
+        "User",
+        foreign_keys=[sender_id]
+    )
 
+    receiver = relationship(
+        "User",
+        foreign_keys=[receiver_id]
+    )
+
+
+# ==================================================
+# AUDIT LOG
+# ==================================================
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
@@ -290,6 +441,10 @@ class AuditLog(Base):
     entity = Column(String)
 
     entity_id = Column(Integer)
+
+    old_value = Column(Text)
+
+    new_value = Column(Text)
 
     created_at = Column(DateTime)
 

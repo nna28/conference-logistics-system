@@ -2,12 +2,13 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+from models.models import ContractStatusEnum
 
 class ContractCreate(BaseModel):
     workshop_id: int
     venue_id: int
     sales_manager_id: Optional[int] = None
-    status: Optional[str] = "Draft"
+    status: Optional[ContractStatusEnum] = "Draft"
     meeting_rooms: Optional[int] = None
     seating_style: Optional[str] = None
     av_requirements: Optional[str] = None
@@ -15,7 +16,7 @@ class ContractCreate(BaseModel):
 
 
 class ContractUpdate(BaseModel):
-    status: Optional[str] = None
+    status: Optional[ContractStatusEnum] = None
     sales_manager_id: Optional[int] = None
     meeting_rooms: Optional[int] = None
     seating_style: Optional[str] = None
@@ -29,7 +30,7 @@ class ContractResponse(BaseModel):
     workshop_id: Optional[int] = None
     venue_id: Optional[int] = None
     sales_manager_id: Optional[int] = None
-    status: Optional[str] = None
+    status: Optional[ContractStatusEnum] = None
     meeting_rooms: Optional[int] = None
     seating_style: Optional[str] = None
     av_requirements: Optional[str] = None

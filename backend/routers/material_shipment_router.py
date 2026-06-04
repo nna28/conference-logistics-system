@@ -21,7 +21,8 @@ from services.audit_service import (
 )
 
 from core.dependencies import (
-    get_current_user, require_role
+    get_current_user,
+    require_role
 )
 
 router = APIRouter(
@@ -33,7 +34,15 @@ router = APIRouter(
 @router.get(
     "/",
     response_model=list[MaterialShipmentResponse],
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff", "Logistics Coordinator"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_shipments(
     db: Session = Depends(get_db)
@@ -46,7 +55,15 @@ def get_shipments(
 @router.get(
     "/{shipment_id}",
     response_model=MaterialShipmentResponse,
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff", "Logistics Coordinator"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_shipment(
     shipment_id: int,
@@ -69,7 +86,15 @@ def get_shipment(
 
 @router.get(
     "/{shipment_id}/overview",
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff", "Logistics Coordinator"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_shipment_overview(
     shipment_id: int,
@@ -111,7 +136,15 @@ def get_shipment_overview(
 @router.post(
     "/",
     response_model=MaterialShipmentResponse,
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def create_shipment(
     request: MaterialShipmentCreate,
@@ -147,14 +180,9 @@ def create_shipment(
         )
 
     shipment = MaterialShipment(
-        material_request_id=
-        request.material_request_id,
-
-        material_id=
-        request.material_id,
-
-        quantity=
-        request.quantity
+        material_request_id=request.material_request_id,
+        material_id=request.material_id,
+        quantity=request.quantity
     )
 
     db.add(shipment)
@@ -176,7 +204,15 @@ def create_shipment(
 @router.put(
     "/{shipment_id}",
     response_model=MaterialShipmentResponse,
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def update_shipment(
     shipment_id: int,
@@ -203,8 +239,6 @@ def update_shipment(
         exclude_unset=True
     )
 
-    old_status = shipment.status if hasattr(shipment, "status") else None
-    
     for key, value in update_data.items():
         setattr(
             shipment,
@@ -213,25 +247,8 @@ def update_shipment(
         )
 
     db.commit()
-    db.refresh(shipment)
 
-    # Auto notification logic
-    new_status = getattr(shipment, "status", None)
-    if new_status == "Shipped" and old_status != "Shipped":
-        from models.models import Notification
-        from datetime import datetime, timezone
-        logistics_users = db.query(User).filter(User.role == "Logistics Coordinator").all()
-        for l_user in logistics_users:
-            notification = Notification(
-                sender_id=current_user.id,
-                receiver_id=l_user.id,
-                title="Shipment Shipped",
-                message=f"Material Shipment #{shipment.id} has been shipped.",
-                is_read=False,
-                created_at=datetime.now(timezone.utc)
-            )
-            db.add(notification)
-        db.commit()
+    db.refresh(shipment)
 
     create_audit_log(
         db,
@@ -245,7 +262,15 @@ def update_shipment(
 
 @router.delete(
     "/{shipment_id}",
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff"))]
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Materials Handling Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def delete_shipment(
     shipment_id: int,

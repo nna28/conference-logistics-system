@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+from models.models import RoleEnum
 
 class UserBase(BaseModel):
     full_name: str
@@ -15,7 +16,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     username: Optional[str] = None
-    role: Optional[str] = None
+    role: Optional[RoleEnum] = None
     password: Optional[str] = None
 
 

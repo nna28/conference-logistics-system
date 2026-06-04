@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+from models.models import WorkshopStatusEnum
 
 class WorkshopCreate(BaseModel):
     workshop_code: str
@@ -10,7 +11,7 @@ class WorkshopCreate(BaseModel):
     expected_attendees: Optional[int] = None
     city: Optional[str] = None
     trainer_id: Optional[int] = None
-    status: Optional[str] = "Pending"
+    status: Optional[WorkshopStatusEnum] = "Pending"
 
 
 class WorkshopUpdate(BaseModel):
@@ -18,7 +19,7 @@ class WorkshopUpdate(BaseModel):
     scheduled_time: Optional[datetime] = None
     expected_attendees: Optional[int] = None
     city: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[WorkshopStatusEnum] = None
     trainer_id: Optional[int] = None
 
 
@@ -29,7 +30,7 @@ class WorkshopResponse(BaseModel):
     scheduled_time: Optional[datetime] = None
     expected_attendees: Optional[int] = None
     city: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[WorkshopStatusEnum] = None
     trainer_id: Optional[int] = None
 
     class Config:

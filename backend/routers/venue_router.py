@@ -19,7 +19,8 @@ from services.audit_service import (
 )
 
 from core.dependencies import (
-    get_current_user
+    get_current_user,
+    require_role
 )
 
 router = APIRouter(
@@ -30,19 +31,35 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=list[VenueResponse]
+    response_model=list[VenueResponse],
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_venues(
     db: Session = Depends(get_db)
 ):
-    return db.query(
-        Venue
-    ).all()
+    return db.query(Venue).all()
 
 
 @router.get(
     "/{venue_id}",
-    response_model=VenueResponse
+    response_model=VenueResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def get_venue(
     venue_id: int,
@@ -63,7 +80,18 @@ def get_venue(
     return venue
 
 
-@router.get("/{venue_id}/overview")
+@router.get(
+    "/{venue_id}/overview",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Booking Staff",
+                "Logistics Coordinator"
+            )
+        )
+    ]
+)
 def get_venue_overview(
     venue_id: int,
     db: Session = Depends(get_db)
@@ -81,14 +109,21 @@ def get_venue_overview(
         )
 
     return {
-        "venue": venue,
-        "sales_manager": None
+        "venue": venue
     }
 
 
 @router.post(
     "/",
-    response_model=VenueResponse
+    response_model=VenueResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def create_venue(
     request: VenueCreate,
@@ -104,7 +139,11 @@ def create_venue(
         room_type=request.room_type,
         equipment_supported=request.equipment_supported,
         capacity=request.capacity,
-        is_available=request.is_available if request.is_available is not None else 1,
+        is_available=(
+            request.is_available
+            if request.is_available is not None
+            else True
+        )
     )
 
     db.add(venue)
@@ -125,7 +164,15 @@ def create_venue(
 
 @router.put(
     "/{venue_id}",
-    response_model=VenueResponse
+    response_model=VenueResponse,
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin",
+                "Logistics Coordinator"
+            )
+        )
+    ]
 )
 def update_venue(
     venue_id: int,
@@ -172,7 +219,16 @@ def update_venue(
     return venue
 
 
-@router.delete("/{venue_id}")
+@router.delete(
+    "/{venue_id}",
+    dependencies=[
+        Depends(
+            require_role(
+                "Admin"
+            )
+        )
+    ]
+)
 def delete_venue(
     venue_id: int,
     db: Session = Depends(get_db),
@@ -191,7 +247,7 @@ def delete_venue(
             status_code=404,
             detail="Venue not found"
         )
-    
+
     create_audit_log(
         db,
         current_user.id,

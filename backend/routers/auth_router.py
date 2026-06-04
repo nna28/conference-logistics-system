@@ -53,7 +53,7 @@ def login(
     token = create_access_token(
         {
             "user_id": user.id,
-            "role": user.role
+            "role": user.role.value
         }
     )
 
@@ -61,5 +61,5 @@ def login(
         "access_token": token,
         "user_id": user.id,
         "full_name": user.full_name,
-        "role": user.role
+        "role": user.role.value
     }
