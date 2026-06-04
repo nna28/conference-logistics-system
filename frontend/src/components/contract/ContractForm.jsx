@@ -107,10 +107,10 @@ export default function ContractForm({
                 value={formData.status || ""}
                 onChange={handleChange}
               >
-                <option value="Draft">Draft</option>
-                <option value="Sent">Sent to Partner</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
+                <option value="PENDING">Pending</option>
+                <option value="EDITING">Editing</option>
+                <option value="APPROVED">Approved</option>
+                <option value="COMPLETED">Completed</option>
               </select>
             </div>
           )}

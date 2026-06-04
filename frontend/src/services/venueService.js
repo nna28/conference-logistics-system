@@ -2,12 +2,17 @@ import api from "../api/axios";
 
 const venueService = {
   getAll: async (filters = {}) => {
-    const params = new URLSearchParams();
-    if (filters.city) params.append("city", filters.city);
-    if (filters.room_type) params.append("room_type", filters.room_type);
-    if (filters.max_cost) params.append("max_cost", filters.max_cost);
-    if (filters.min_capacity) params.append("min_capacity", filters.min_capacity);
-    const res = await api.get(`/venues/?${params.toString()}`);
+    // 1. Lọc ra các tham số có giá trị hợp lệ (bỏ qua rỗng hoặc undefined)
+    const validParams = {};
+    if (filters.city) validParams.city = filters.city;
+    if (filters.room_type) validParams.room_type = filters.room_type;
+    if (filters.max_cost) validParams.max_cost = filters.max_cost;
+    if (filters.min_capacity) validParams.min_capacity = filters.min_capacity;
+
+    // 2. Truyền thẳng vào cấu hình 'params' của Axios
+    // Axios sẽ tự động nối dấu ? nếu có tham số, và KHÔNG nối gì nếu params rỗng!
+    const res = await api.get("/venues/", { params: validParams });
+    
     return res.data;
   },
 

@@ -141,7 +141,7 @@ def create_contract(
         workshop_id=request.workshop_id,
         venue_id=request.venue_id,
         sales_manager_id=request.sales_manager_id,
-        status=request.status or "Draft",
+        status=request.status or "PENDING",
         meeting_rooms=request.meeting_rooms,
         seating_style=request.seating_style,
         av_requirements=request.av_requirements,
@@ -159,6 +159,20 @@ def create_contract(
         "CREATE",
         f"Contract #{contract.id}"
     )
+
+    from models.models import Notification
+    import datetime
+
+    if request.sales_manager_id:
+        notif = Notification(
+            sender_id=current_user.id,
+            receiver_id=request.sales_manager_id,
+            title="New Contract Assigned",
+            message=f"You have been assigned to Contract #{contract.id} for Workshop #{contract.workshop_id}.",
+            created_at=datetime.datetime.utcnow()
+        )
+        db.add(notif)
+        db.commit()
 
     return contract
 
@@ -252,3 +266,37 @@ def delete_contract(
         "message":
         "Contract deleted successfully"
     }
+
+
+@router.post(
+    "/{contract_id}/notify-completion"
+)
+def notify_contract_completion(
+    contract_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    contract = db.query(Contract).filter(Contract.id == contract_id).first()
+    if not contract:
+        raise HTTPException(404, "Contract not found")
+        
+    contract.status = "COMPLETED"
+    
+    from models.models import Notification
+    from datetime import datetime, timezone
+    
+    # Notify Sales Manager & Logistics Coordinator
+    users = db.query(User).filter(User.role.in_(["Sales Manager", "Logistics Coordinator"])).all()
+    for u in users:
+        notif = Notification(
+            sender_id=current_user.id,
+            receiver_id=u.id,
+            title="Contract Completed",
+            message=f"Contract #{contract.id} has been fully completed and confirmed.",
+            created_at=datetime.now(timezone.utc)
+        )
+        db.add(notif)
+        
+    create_audit_log(db, current_user.id, "UPDATE", f"Contract #{contract.id} marked as completed")
+    db.commit()
+    return {"message": "Success"}

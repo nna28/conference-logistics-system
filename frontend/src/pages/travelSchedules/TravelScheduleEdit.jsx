@@ -7,6 +7,8 @@ import PageHeader from "../../components/layout/PageHeader";
 import TravelScheduleForm from "../../components/travelSchedule/TravelScheduleForm";
 
 import travelScheduleService from "../../services/travelScheduleService";
+import workshopService from "../../services/workshopService";
+import userService from "../../services/userService";
 
 export default function TravelScheduleEdit() {
   const { id } = useParams();
@@ -14,12 +16,28 @@ export default function TravelScheduleEdit() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [workshops, setWorkshops] = useState([]);
+  const [consultants, setConsultants] = useState([]);
 
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
+    loadOptions();
     loadSchedule();
   }, []);
+
+  const loadOptions = async () => {
+    try {
+      const [wsData, usersData] = await Promise.all([
+        workshopService.getAll(),
+        userService.getAll(),
+      ]);
+      setWorkshops(wsData);
+      setConsultants(usersData.filter(u => u.role === "Training Consultant" || u.role === "Consultant"));
+    } catch (error) {
+      console.error("Failed to load options", error);
+    }
+  };
 
   const loadSchedule = async () => {
     try {
@@ -71,6 +89,8 @@ export default function TravelScheduleEdit() {
         onSubmit={handleSubmit}
         submitLabel="Save Changes"
         loading={loading}
+        workshops={workshops}
+        consultants={consultants}
       />
     </>
   );

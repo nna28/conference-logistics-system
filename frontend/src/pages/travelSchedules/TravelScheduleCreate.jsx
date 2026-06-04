@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import BackButton from "../../components/layout/BackButton";
@@ -7,11 +7,32 @@ import PageHeader from "../../components/layout/PageHeader";
 import TravelScheduleForm from "../../components/travelSchedule/TravelScheduleForm";
 
 import travelScheduleService from "../../services/travelScheduleService";
+import workshopService from "../../services/workshopService";
+import userService from "../../services/userService";
 
 export default function TravelScheduleCreate() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [workshops, setWorkshops] = useState([]);
+  const [consultants, setConsultants] = useState([]);
+
+  useEffect(() => {
+    loadOptions();
+  }, []);
+
+  const loadOptions = async () => {
+    try {
+      const [wsData, usersData] = await Promise.all([
+        workshopService.getAll(),
+        userService.getAll(),
+      ]);
+      setWorkshops(wsData);
+      setConsultants(usersData.filter(u => u.role === "Training Consultant" || u.role === "Consultant"));
+    } catch (error) {
+      console.error("Failed to load options", error);
+    }
+  };
 
   const [formData, setFormData] = useState({
     workshop_id: "",
@@ -58,6 +79,8 @@ export default function TravelScheduleCreate() {
         onSubmit={handleSubmit}
         submitLabel="Create Travel Schedule"
         loading={loading}
+        workshops={workshops}
+        consultants={consultants}
       />
     </>
   );

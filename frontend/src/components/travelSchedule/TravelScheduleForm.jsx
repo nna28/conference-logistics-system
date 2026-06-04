@@ -6,6 +6,8 @@ export default function TravelScheduleForm({
   onSubmit,
   submitLabel = "Save",
   loading = false,
+  workshops = [],
+  consultants = [],
 }) {
   const handleChange = (e) => {
     setFormData({
@@ -22,25 +24,37 @@ export default function TravelScheduleForm({
         <div className="form-grid">
 
           <div className="form-group">
-            <label>Workshop ID</label>
-            <input
-              type="number"
+            <label>Workshop</label>
+            <select
               name="workshop_id"
               value={formData.workshop_id || ""}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">-- Select Workshop --</option>
+              {workshops.map(w => (
+                <option key={w.id} value={w.id}>
+                  {w.workshop_code} ({w.city || "No City"})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
-            <label>Consultant ID</label>
-            <input
-              type="number"
+            <label>Consultant</label>
+            <select
               name="consultant_id"
               value={formData.consultant_id || ""}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">-- Select Consultant --</option>
+              {consultants.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.full_name} (@{c.username})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">

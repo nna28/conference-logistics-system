@@ -99,6 +99,46 @@ def get_material_request_overview(
     }
 
 
+@router.post("/{request_id}/notify-completion")
+def notify_material_request_completion(
+    request_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    request = db.query(MaterialRequest).filter(MaterialRequest.id == request_id).first()
+    if not request:
+        raise HTTPException(status_code=404, detail="Material request not found")
+    
+    # Optional auto-update to Delivered
+    request.shipping_status = "DELIVERED"
+    db.commit()
+
+    create_audit_log(
+        db,
+        current_user.id,
+        "NOTIFY",
+        f"Material Request #{request.id} completion notified"
+    )
+
+    from models.models import Notification, User
+    import datetime
+
+    logistics_users = db.query(User).filter(User.role == "Logistics Coordinator").all()
+    for l_user in logistics_users:
+        notification = Notification(
+            sender_id=current_user.id,
+            receiver_id=l_user.id,
+            title="Material Request Delivered",
+            message=f"Material Request #{request.id} has been delivered.",
+            created_at=datetime.datetime.utcnow()
+        )
+        db.add(notification)
+    
+    db.commit()
+
+    return {"message": "Completion notification sent"}
+
+
 @router.post(
     "/",
     response_model=MaterialRequestResponse
@@ -122,13 +162,11 @@ def create_material_request(
             detail="Workshop not found"
         )
 
-    calc_qty = workshop.expected_attendees if workshop.expected_attendees else request.quantity_needed
-
     material_request = MaterialRequest(
         workshop_id=request.workshop_id,
-        quantity_needed=calc_qty,
-        packaging_status=request.packaging_status or "Pending",
-        shipping_status=request.shipping_status or "Pending",
+        quantity_needed=request.quantity_needed,
+        packaging_status=request.packaging_status or "PENDING",
+        shipping_status=request.shipping_status or "PENDING",
         shipping_date=request.shipping_date,
     )
 

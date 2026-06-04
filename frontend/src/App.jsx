@@ -143,7 +143,7 @@ function App() {
           <Route
             path="/workshops"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Training Consultant", "Logistics Coordinator"]}>
                 <WorkshopList />
               </RoleGuard>
             }
@@ -152,7 +152,7 @@ function App() {
           <Route
             path="/workshops/new"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
                 <WorkshopCreate />
               </RoleGuard>
             }
@@ -161,7 +161,7 @@ function App() {
           <Route
             path="/workshops/edit/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
                 <WorkshopEdit />
               </RoleGuard>
             }
@@ -170,7 +170,7 @@ function App() {
           <Route
             path="/workshops/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Training Consultant", "Logistics Coordinator"]}>
                 <WorkshopDetail />
               </RoleGuard>
             }
@@ -180,7 +180,7 @@ function App() {
           <Route
             path="/venues"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager", "Logistics Coordinator"]}>
                 <VenueList />
               </RoleGuard>
             }
@@ -189,7 +189,7 @@ function App() {
           <Route
             path="/venues/new"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager", "Logistics Coordinator"]}>
                 <VenueCreate />
               </RoleGuard>
             }
@@ -198,7 +198,7 @@ function App() {
           <Route
             path="/venues/edit/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager", "Logistics Coordinator"]}>
                 <VenueEdit />
               </RoleGuard>
             }
@@ -207,7 +207,7 @@ function App() {
           <Route
             path="/venues/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager", "Logistics Coordinator"]}>
                 <VenueDetail />
               </RoleGuard>
             }
@@ -217,7 +217,7 @@ function App() {
           <Route
             path="/contracts"
             element={
-              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"]}>
                 <ContractList />
               </RoleGuard>
             }
@@ -226,7 +226,7 @@ function App() {
           <Route
             path="/contracts/new"
             element={
-              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"]}>
                 <ContractCreate />
               </RoleGuard>
             }
@@ -235,7 +235,7 @@ function App() {
           <Route
             path="/contracts/edit/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"]}>
                 <ContractEdit />
               </RoleGuard>
             }
@@ -244,7 +244,7 @@ function App() {
           <Route
             path="/contracts/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"]}>
                 <ContractDetail />
               </RoleGuard>
             }
@@ -254,7 +254,7 @@ function App() {
           <Route
             path="/travel-schedules"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant"]}>
                 <TravelScheduleList />
               </RoleGuard>
             }
@@ -281,7 +281,7 @@ function App() {
           <Route
             path="/travel-schedules/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant"]}>
                 <TravelScheduleDetail />
               </RoleGuard>
             }
@@ -328,7 +328,7 @@ function App() {
           <Route
             path="/material-requests"
             element={
-              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
                 <MaterialRequestList />
               </RoleGuard>
             }
@@ -337,7 +337,7 @@ function App() {
           <Route
             path="/material-requests/new"
             element={
-              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
                 <MaterialRequestCreate />
               </RoleGuard>
             }
@@ -346,7 +346,7 @@ function App() {
           <Route
             path="/material-requests/edit/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
                 <MaterialRequestEdit />
               </RoleGuard>
             }
@@ -355,7 +355,7 @@ function App() {
           <Route
             path="/material-requests/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
                 <MaterialRequestDetail />
               </RoleGuard>
             }

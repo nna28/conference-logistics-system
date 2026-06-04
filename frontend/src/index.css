@@ -153,7 +153,8 @@ input, select, textarea {
   color: var(--green);
 }
 
-.badge-draft {
+.badge-draft,
+.badge-editing {
   background: var(--blue-light);
   color: var(--blue);
 }

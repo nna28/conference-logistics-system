@@ -14,6 +14,9 @@ function WorkshopList() {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
+  const userRole = localStorage.getItem("role") || "";
+  const canEdit = userRole !== "Training Consultant";
+
   const loadData = async () => {
     try {
       const data = await workshopService.getAll();
@@ -42,7 +45,7 @@ function WorkshopList() {
       <PageHeader
         title="Workshops"
         subtitle="Manage and track your workshops"
-        onCreate={() => navigate("/workshops/new")}
+        onCreate={canEdit ? () => navigate("/workshops/new") : undefined}
         createLabel="New Workshop"
         showSearch
         searchValue={search}
@@ -83,8 +86,12 @@ function WorkshopList() {
                   <td>
                     <div className="table-actions">
                       <Link to={`/workshops/${item.id}`} title="View">👁</Link>
-                      <Link to={`/workshops/edit/${item.id}`} title="Edit">✏️</Link>
-                      <button className="delete" onClick={() => setDeleteId(item.id)} title="Delete">🗑</button>
+                      {canEdit && (
+                        <>
+                          <Link to={`/workshops/edit/${item.id}`} title="Edit">✏️</Link>
+                          <button className="delete" onClick={() => setDeleteId(item.id)} title="Delete">🗑</button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

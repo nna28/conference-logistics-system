@@ -7,7 +7,7 @@ class ContractCreate(BaseModel):
     workshop_id: int
     venue_id: int
     sales_manager_id: Optional[int] = None
-    status: Optional[str] = "Draft"
+    status: Optional[str] = "PENDING"
     meeting_rooms: Optional[int] = None
     seating_style: Optional[str] = None
     av_requirements: Optional[str] = None

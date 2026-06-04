@@ -39,12 +39,19 @@ export default function MaterialForm({
               Material Type
             </label>
 
-            <input
+            <select
               name="material_type"
               value={formData.material_type || ""}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">-- Select Type --</option>
+              <option value="Document">Document</option>
+              <option value="Equipment">Equipment</option>
+              <option value="Stationery">Stationery</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
         </div>

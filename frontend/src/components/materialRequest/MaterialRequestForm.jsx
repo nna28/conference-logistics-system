@@ -6,6 +6,7 @@ export default function MaterialRequestForm({
   onSubmit,
   submitLabel = "Save",
   loading = false,
+  workshops = [],
 }) {
   const handleChange = (e) => {
     setFormData({
@@ -22,11 +23,28 @@ export default function MaterialRequestForm({
         <div className="form-grid">
 
           <div className="form-group">
-            <label>Workshop ID</label>
-            <input
-              type="number"
+            <label>Workshop</label>
+            <select
               name="workshop_id"
               value={formData.workshop_id || ""}
+              onChange={handleChange}
+              required
+            >
+              <option value="">-- Select Workshop --</option>
+              {workshops.map(w => (
+                <option key={w.id} value={w.id}>
+                  {w.workshop_code} - {w.expected_attendees || 0} attendees ({w.city || "No City"})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Quantity Needed</label>
+            <input
+              type="number"
+              name="quantity_needed"
+              value={formData.quantity_needed || ""}
               onChange={handleChange}
               required
             />
@@ -45,7 +63,7 @@ export default function MaterialRequestForm({
 
           <div className="form-group full-width" style={{ padding: "12px", background: "var(--bg-card-hover)", borderRadius: "8px", border: "1px dashed var(--border-color)" }}>
             <p style={{ color: "var(--text-muted)", fontSize: "14px", margin: 0 }}>
-              ℹ️ <strong>Note:</strong> Delivery Address and Quantity will be automatically calculated based on the Workshop's Venue Contract and Expected Attendees.
+              ℹ️ <strong>Note:</strong> Delivery Address will be automatically calculated based on the Workshop's Venue Contract.
             </p>
           </div>
 
@@ -58,15 +76,15 @@ export default function MaterialRequestForm({
                 value={formData.status || ""}
                 onChange={handleChange}
               >
-                <option value="Pending">
+                <option value="PENDING">
                   Pending
                 </option>
 
-                <option value="Approved">
+                <option value="APPROVED">
                   Approved
                 </option>
 
-                <option value="Rejected">
+                <option value="REJECTED">
                   Rejected
                 </option>
               </select>

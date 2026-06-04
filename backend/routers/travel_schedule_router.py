@@ -159,6 +159,20 @@ def create_travel_schedule(
         f"Travel Schedule #{schedule.id}"
     )
 
+    from models.models import Notification
+    import datetime
+
+    if request.consultant_id:
+        notif = Notification(
+            sender_id=current_user.id,
+            receiver_id=request.consultant_id,
+            title="New Travel Schedule",
+            message=f"You have been assigned to Travel Schedule #{schedule.id} for Workshop #{schedule.workshop_id}.",
+            created_at=datetime.datetime.utcnow()
+        )
+        db.add(notif)
+        db.commit()
+
     return schedule
 
 
@@ -245,8 +259,42 @@ def delete_schedule(
 
     return {
         "message":
-        "Schedule deleted successfully"
+        "Travel schedule deleted successfully"
     }
+
+
+@router.post(
+    "/{schedule_id}/notify-completion"
+)
+def notify_schedule_completion(
+    schedule_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    schedule = db.query(TravelSchedule).filter(TravelSchedule.id == schedule_id).first()
+    if not schedule:
+        raise HTTPException(404, "Travel schedule not found")
+        
+    schedule.status = "CONFIRMED"
+    
+    from models.models import Notification
+    from datetime import datetime, timezone
+    
+    # Notify Booking Staff & Logistics Coordinator
+    users = db.query(User).filter(User.role.in_(["Booking Staff", "Logistics Coordinator"])).all()
+    for u in users:
+        notif = Notification(
+            sender_id=current_user.id,
+            receiver_id=u.id,
+            title="Travel Schedule Confirmed",
+            message=f"Consultant has confirmed Travel Schedule #{schedule.id}.",
+            created_at=datetime.now(timezone.utc)
+        )
+        db.add(notif)
+        
+    create_audit_log(db, current_user.id, "UPDATE", f"Travel Schedule #{schedule.id} confirmed")
+    db.commit()
+    return {"message": "Success"}
 
 @router.post("/{schedule_id}/upload-confirmation")
 async def upload_confirmation(

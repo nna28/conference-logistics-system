@@ -37,20 +37,22 @@ router = APIRouter(
 @router.get(
     "/",
     response_model=list[WorkshopResponse],
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager"))]
+    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator","Training Consultant" ,"Sales Manager","Materials Handling Staff"))]
 )
 def get_workshops(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    return db.query(
-        Workshop
-    ).all()
+    query = db.query(Workshop)
+    if current_user.role == "Training Consultant":
+        query = query.filter(Workshop.trainer_id == current_user.id)
+    return query.all()
 
 
 @router.get(
     "/{workshop_id}",
     response_model=WorkshopResponse,
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager"))]
+    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager", "Training Consultant"))]
 )
 def get_workshop(
     workshop_id: int,
@@ -255,13 +257,39 @@ def create_workshop(
         f"Workshop #{workshop.id}"
     )
 
+    from models.models import Notification
+    import datetime
+
+    if request.trainer_id:
+        notif = Notification(
+            sender_id=current_user.id,
+            receiver_id=request.trainer_id,
+            title="New Workshop Assigned",
+            message=f"You have been assigned to Workshop {workshop.workshop_code}.",
+            created_at=datetime.datetime.utcnow()
+        )
+        db.add(notif)
+
+    logistics_users = db.query(User).filter(User.role == "Logistics Coordinator").all()
+    for l_user in logistics_users:
+        notif2 = Notification(
+            sender_id=current_user.id,
+            receiver_id=l_user.id,
+            title="New Workshop Info",
+            message=f"A new workshop {workshop.workshop_code} has been created.",
+            created_at=datetime.datetime.utcnow()
+        )
+        db.add(notif2)
+        
+    db.commit()
+
     return workshop
 
 
 @router.put(
     "/{workshop_id}",
     response_model=WorkshopResponse,
-    dependencies=[Depends(require_role("Admin", "Booking Staff"))]
+    dependencies=[Depends(require_role("Admin", "Booking Staff","Logistics Coordinator"))]
 )
 def update_workshop(
     workshop_id: int,

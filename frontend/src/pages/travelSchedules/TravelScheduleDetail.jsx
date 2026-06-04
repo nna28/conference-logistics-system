@@ -36,6 +36,24 @@ export default function TravelScheduleDetail() {
     }
   };
 
+  const handleConfirm = async () => {
+    if (!window.confirm("Confirm this travel schedule?")) return;
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`http://localhost:8000/travel-schedules/${id}/notify-completion`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Failed");
+      alert("Đã gửi thông báo xác nhận thành công!");
+      loadData();
+    } catch(err) {
+      alert("Error: " + err.message);
+    }
+  };
+
+
+
   useEffect(() => {
     loadData();
   }, [id]);
@@ -63,18 +81,25 @@ export default function TravelScheduleDetail() {
           <h1>Schedule #{id}</h1>
         </div>
         <div className="page-header-actions" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          {["Admin", "Training Consultant"].includes(userRole) && travel_schedule.status !== "CONFIRMED" && (
+            <button className="btn btn-primary" style={{ background: "#22c55e", borderColor: "#22c55e" }} onClick={handleConfirm}>
+              ✅ Xác nhận thành công
+            </button>
+          )}
           {["Admin", "Logistics Coordinator", "Booking Staff"].includes(userRole) && (
             <label className="btn btn-outline" style={{ cursor: "pointer", margin: 0 }}>
               {uploading ? "Uploading..." : "📎 Upload Confirmation"}
               <input type="file" style={{ display: "none" }} onChange={handleFileUpload} disabled={uploading} accept=".pdf,.doc,.docx" />
             </label>
           )}
-          <button
-            className="btn btn-outline"
-            onClick={() => navigate(`/travel-schedules/edit/${id}`)}
-          >
-            ✏️ Edit
-          </button>
+          {["Admin", "Logistics Coordinator", "Booking Staff"].includes(userRole) && (
+            <button
+              className="btn btn-outline"
+              onClick={() => navigate(`/travel-schedules/edit/${id}`)}
+            >
+              ✏️ Edit
+            </button>
+          )}
         </div>
       </div>
 

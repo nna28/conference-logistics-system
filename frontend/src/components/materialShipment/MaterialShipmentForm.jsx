@@ -6,6 +6,8 @@ export default function MaterialShipmentForm({
   onSubmit,
   submitLabel = "Save",
   loading = false,
+  materialRequests = [],
+  materials = [],
 }) {
   const handleChange = (e) => {
     setFormData({
@@ -22,33 +24,37 @@ export default function MaterialShipmentForm({
         <div className="form-grid">
 
           <div className="form-group">
-            <label>
-              Material Request ID
-            </label>
-
-            <input
-              type="number"
+            <label>Material Request</label>
+            <select
               name="material_request_id"
-              value={
-                formData.material_request_id || ""
-              }
+              value={formData.material_request_id || ""}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">-- Select Request --</option>
+              {materialRequests.map(r => (
+                <option key={r.id} value={r.id}>
+                  Request #{r.id} ({r.delivery_address || "No Address"})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
-            <label>
-              Material ID
-            </label>
-
-            <input
-              type="number"
+            <label>Material</label>
+            <select
               name="material_id"
               value={formData.material_id || ""}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">-- Select Material --</option>
+              {materials.map(m => (
+                <option key={m.id} value={m.id}>
+                  {m.material_name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
@@ -79,11 +85,11 @@ export default function MaterialShipmentForm({
                   }
                   onChange={handleChange}
                 >
-                  <option value="Pending">
+                  <option value="PENDING">
                     Pending
                   </option>
 
-                  <option value="Packed">
+                  <option value="PACKED">
                     Packed
                   </option>
                 </select>
@@ -101,15 +107,15 @@ export default function MaterialShipmentForm({
                   }
                   onChange={handleChange}
                 >
-                  <option value="Pending">
+                  <option value="PENDING">
                     Pending
                   </option>
 
-                  <option value="Shipping">
+                  <option value="SHIPPING">
                     Shipping
                   </option>
 
-                  <option value="Delivered">
+                  <option value="DELIVERED">
                     Delivered
                   </option>
                 </select>

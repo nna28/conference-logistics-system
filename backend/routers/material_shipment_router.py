@@ -33,7 +33,7 @@ router = APIRouter(
 @router.get(
     "/",
     response_model=list[MaterialShipmentResponse],
-    dependencies=[Depends(require_role("Admin", "Materials Handling Staff", "Logistics Coordinator"))]
+    dependencies=[Depends(require_role("Admin", "Materials Handling Staff", "Sales Manager" ,"Logistics Coordinator"))]
 )
 def get_shipments(
     db: Session = Depends(get_db)

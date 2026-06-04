@@ -21,15 +21,26 @@ function WorkshopEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData };
-    if (payload.expected_attendees === "") payload.expected_attendees = null;
-    if (payload.trainer_id === "") payload.trainer_id = null;
-    if (payload.scheduled_time === "") payload.scheduled_time = null;
-
-    await workshopService.update(id, payload);
-    navigate("/workshops");
+    // Nên có loading state ở đây nếu bạn muốn, ví dụ: setLoading(true);
+    
+    try {
+      // Gọi API cập nhật
+      await workshopService.update(id, formData); // Hoặc tên biến data của bạn
+      
+      alert("Cập nhật Khóa học thành công!");
+      navigate("/workshops"); // Quay về danh sách
+      
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        alert("Lỗi: Bạn không có quyền chỉnh sửa Khóa học này!");
+      } else {
+        alert("Lỗi khi lưu: " + (error.response?.data?.detail || error.message));
+      }
+      console.error("Lỗi cập nhật:", error);
+    } finally {
+      // setLoading(false);
+    }
   };
-
   return (
     <>
       <BackButton />

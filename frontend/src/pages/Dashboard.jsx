@@ -75,7 +75,20 @@ export default function Dashboard() {
   }, []);
 
   const loadDashboard = async () => {
+    // 💡 Helper function: Nếu API gọi thành công thì lấy dữ liệu, nếu bị lỗi (403, 500...) thì trả về mảng rỗng []
+    const fetchSafe = async (promise) => {
+      try {
+        const data = await promise;
+        // Đảm bảo luôn trả về mảng, đề phòng API trả về null/undefined
+        return Array.isArray(data) ? data : []; 
+      } catch (error) {
+        console.warn("API call failed (possibly 403 Forbidden):", error.message);
+        return []; 
+      }
+    };
+
     try {
+      // ✅ Bọc tất cả các lời gọi API bằng fetchSafe
       const [
         workshops,
         venues,
@@ -84,12 +97,12 @@ export default function Dashboard() {
         requests,
         shipments,
       ] = await Promise.all([
-        workshopService.getAll(),
-        venueService.getAll(),
-        contractService.getAll(),
-        travelScheduleService.getAll(),
-        materialRequestService.getAll(),
-        materialShipmentService.getAll(),
+        fetchSafe(workshopService.getAll()),
+        fetchSafe(venueService.getAll()),
+        fetchSafe(contractService.getAll()),
+        fetchSafe(travelScheduleService.getAll()),
+        fetchSafe(materialRequestService.getAll()),
+        fetchSafe(materialShipmentService.getAll()),
       ]);
 
       setStats({
@@ -101,11 +114,13 @@ export default function Dashboard() {
         shipments: shipments.length,
       });
 
+      // Lấy 5 item mới nhất để hiển thị ở các bảng Recent
       setRecentWorkshops(workshops.slice(-5).reverse());
       setRecentRequests(requests.slice(-5).reverse());
       setRecentShipments(shipments.slice(-5).reverse());
+
     } catch (error) {
-      console.error(error);
+      console.error("Critical error in loadDashboard:", error);
     }
   };
 

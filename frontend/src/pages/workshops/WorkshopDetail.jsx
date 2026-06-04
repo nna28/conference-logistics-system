@@ -61,12 +61,14 @@ function WorkshopDetail() {
               {notifyLoading ? "Sending..." : "📢 Notify Logistics"}
             </button>
           )}
-          <button
-            className="btn btn-outline"
-            onClick={() => navigate(`/workshops/edit/${id}`)}
-          >
-            ✏️ Edit
-          </button>
+          {["Admin", "Booking Staff", "Logistics Coordinator"].includes(userRole) && (
+            <button
+              className="btn btn-outline"
+              onClick={() => navigate(`/workshops/edit/${id}`)}
+            >
+              ✏️ Edit
+            </button>
+          )}
         </div>
       </div>
 

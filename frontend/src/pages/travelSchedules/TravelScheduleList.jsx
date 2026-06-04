@@ -12,6 +12,9 @@ export default function TravelScheduleList() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState(null);
+  
+  const userRole = localStorage.getItem("role") || "";
+  const canEdit = userRole !== "Training Consultant";
 
   useEffect(() => {
     loadSchedules();
@@ -51,7 +54,7 @@ export default function TravelScheduleList() {
       <PageHeader
         title="Travel Schedules"
         subtitle="Manage travel schedules"
-        onCreate={() => navigate("/travel-schedules/new")}
+        onCreate={canEdit ? () => navigate("/travel-schedules/new") : undefined}
         createLabel="New Schedule"
         showSearch
         searchValue={search}
@@ -96,12 +99,16 @@ export default function TravelScheduleList() {
                         title="View"
                         onClick={(e) => { e.preventDefault(); navigate(`/travel-schedules/${schedule.id}`); }}
                       >👁</a>
-                      <a
-                        href="#"
-                        title="Edit"
-                        onClick={(e) => { e.preventDefault(); navigate(`/travel-schedules/edit/${schedule.id}`); }}
-                      >✏️</a>
-                      <button className="delete" onClick={() => setDeleteId(schedule.id)} title="Delete">🗑</button>
+                      {canEdit && (
+                        <>
+                          <a
+                            href="#"
+                            title="Edit"
+                            onClick={(e) => { e.preventDefault(); navigate(`/travel-schedules/edit/${schedule.id}`); }}
+                          >✏️</a>
+                          <button className="delete" onClick={() => setDeleteId(schedule.id)} title="Delete">🗑</button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

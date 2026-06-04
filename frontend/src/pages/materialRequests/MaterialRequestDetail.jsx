@@ -9,6 +9,27 @@ export default function MaterialRequestDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [notifyLoading, setNotifyLoading] = useState(false);
+  const userRole = localStorage.getItem("role") || "";
+
+  // ✅ Đã sửa hàm handleNotify để sử dụng Service
+  const handleNotify = async () => {
+    if (!window.confirm("Gửi thông báo hoàn tất cho Logistics Coordinator?")) return;
+    setNotifyLoading(true);
+    try {
+      // Dùng service đã được cấu hình sẵn token thay vì dùng fetch trực tiếp
+      await materialRequestService.notifyCompletion(id);
+      
+      alert("Đã gửi thông báo hoàn tất thành công!");
+      loadData(); // Cập nhật lại giao diện ngay sau khi thông báo thành công
+    } catch (err) {
+      console.error(err);
+      // Hiển thị lỗi từ backend nếu có (ví dụ: bị từ chối quyền, không tìm thấy request...)
+      alert("Lỗi khi gửi thông báo: " + (err.response?.data?.detail || err.message));
+    } finally {
+      setNotifyLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -36,7 +57,16 @@ export default function MaterialRequestDetail() {
           <p className="page-subtitle">Material Request Overview</p>
           <h1>Request #{id}</h1>
         </div>
-        <div className="page-header-actions">
+        <div className="page-header-actions" style={{ display: "flex", gap: "12px" }}>
+          {["Admin", "Materials Handling Staff"].includes(userRole) && (
+            <button
+              className="btn btn-outline"
+              onClick={handleNotify}
+              disabled={notifyLoading}
+            >
+              {notifyLoading ? "Đang gửi..." : "✅ Gửi thông báo hoàn tất"}
+            </button>
+          )}
           <button
             className="btn btn-outline"
             onClick={() => navigate(`/material-requests/edit/${id}`)}

@@ -35,8 +35,8 @@ def create_material(
     material = Material(
         workshop_id=request.workshop_id,
         quantity_needed=request.quantity_needed,
-        packaging_status=request.packaging_status or "Pending",
-        shipping_status=request.shipping_status or "Pending",
+        packaging_status=request.packaging_status or "PENDING",
+        shipping_status=request.shipping_status or "PENDING",
         shipping_date=request.shipping_date,
     )
     db.add(material)

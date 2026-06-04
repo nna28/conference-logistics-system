@@ -7,6 +7,8 @@ import PageHeader from "../../components/layout/PageHeader";
 import MaterialShipmentForm from "../../components/materialShipment/MaterialShipmentForm";
 
 import materialShipmentService from "../../services/materialShipmentService";
+import materialRequestService from "../../services/materialRequestService";
+import materialService from "../../services/materialService";
 
 export default function MaterialShipmentEdit() {
   const { id } = useParams();
@@ -14,12 +16,28 @@ export default function MaterialShipmentEdit() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [materialRequests, setMaterialRequests] = useState([]);
+  const [materials, setMaterials] = useState([]);
 
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
+    loadOptions();
     loadShipment();
   }, []);
+
+  const loadOptions = async () => {
+    try {
+      const [reqData, matData] = await Promise.all([
+        materialRequestService.getAll(),
+        materialService.getAll()
+      ]);
+      setMaterialRequests(reqData);
+      setMaterials(matData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const loadShipment = async () => {
     try {
@@ -72,6 +90,8 @@ export default function MaterialShipmentEdit() {
         onSubmit={handleSubmit}
         submitLabel="Save Changes"
         loading={loading}
+        materialRequests={materialRequests}
+        materials={materials}
       />
     </>
   );

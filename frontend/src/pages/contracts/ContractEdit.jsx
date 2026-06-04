@@ -23,7 +23,7 @@ export default function ContractEdit() {
     seating_style: "",
     av_requirements: "",
     revision_notes: "",
-    status: "Draft",
+    status: "PENDING",
   });
 
   useEffect(() => {

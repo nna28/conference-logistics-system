@@ -1,4 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import notificationService from "../../services/notificationService";
+
 
 const navItems = [
   {
@@ -148,12 +151,27 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const userRole = localStorage.getItem("role") || "";
   const fullName = localStorage.getItem("full_name") || "A";
+  const userId = localStorage.getItem("user_id");
   const initials = fullName
     .split(" ")
     .map((w) => w[0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (userId) {
+      notificationService.getByUser(userId)
+        .then(data => {
+          const unread = data.filter(n => !n.is_read).length;
+          setUnreadCount(unread);
+        })
+        .catch(err => console.error("Error fetching notifications", err));
+    }
+  }, [userId]);
+
 
   const handleLogout = () => {
     localStorage.clear();
@@ -163,12 +181,11 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       {/* Logo */}
-      <div className="sidebar-logo">
+      <div className="sidebar-logo" title="Conference Logistics System">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
         </svg>
       </div>
 
@@ -178,15 +195,15 @@ const Sidebar = () => {
           <NavItem key={item.to} {...item} />
         ))}
 
-        {["Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager"].includes(userRole) && (
+        {["Admin", "Booking Staff", "Training Consultant", "Logistics Coordinator", "Sales Manager"].includes(userRole) && (
           <>
             <div className="sidebar-section-divider" />
             {conferenceItems.map((item) => {
               // specific role checks for inner items
               if (item.to === "/users" && userRole !== "Admin") return null;
-              if (item.to === "/contracts" && !["Admin", "Sales Manager", "Booking Staff"].includes(userRole)) return null;
-              if (item.to === "/venues" && !["Admin", "Sales Manager", "Booking Staff"].includes(userRole)) return null;
-              if (item.to === "/travel-schedules" && !["Admin", "Booking Staff", "Logistics Coordinator"].includes(userRole)) return null;
+              if (item.to === "/contracts" && !["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"].includes(userRole)) return null;
+              if (item.to === "/venues" && !["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"].includes(userRole)) return null;
+              if (item.to === "/travel-schedules" && !["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant"].includes(userRole)) return null;
               return <NavItem key={item.to} {...item} />;
             })}
           </>
@@ -196,7 +213,7 @@ const Sidebar = () => {
           <>
             <div className="sidebar-section-divider" />
             {materialItems.map((item) => {
-              if (item.to === "/material-requests" && !["Admin", "Materials Handling Staff"].includes(userRole)) return null;
+              if (item.to === "/material-requests" && !["Admin", "Materials Handling Staff", "Logistics Coordinator"].includes(userRole)) return null;
               return <NavItem key={item.to} {...item} />;
             })}
           </>
@@ -215,10 +232,30 @@ const Sidebar = () => {
         {/* Notifications for everyone */}
         <div className="sidebar-section-divider" />
         <NavItem to="/notifications" tooltip="Notifications" icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 01-3.46 0"/>
-          </svg>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}>
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 01-3.46 0"/>
+            </svg>
+            {unreadCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-6px',
+                backgroundColor: '#e41e3f',
+                color: 'white',
+                borderRadius: '50%',
+                padding: '2px 5px',
+                fontSize: '10px',
+                fontWeight: 'bold',
+                minWidth: '16px',
+                textAlign: 'center',
+                lineHeight: 1
+              }}>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </div>
         } />
       </nav>
 

@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[UserResponse], dependencies=[Depends(require_role("Admin", "Booking Staff", "Sales Manager"))])
+@router.get("/", response_model=list[UserResponse], dependencies=[Depends(require_role("Admin", "Booking Staff","Logistics Coordinator", "Training Consultant" ,"Sales Manager"))])
 def get_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 

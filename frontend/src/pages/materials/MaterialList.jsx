@@ -38,11 +38,13 @@ export default function MaterialList() {
     }
   };
 
-  const filtered = materials.filter((m) =>
-    (m.material_name + m.material_type)
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  // ✅ Đoạn code an toàn (Chống sập 100%)
+const filtered = materials.filter((m) => {
+  const name = m.material_name || "";
+  const type = m.material_type || "";
+  
+  return `${name} ${type}`.toLowerCase().includes((search || "").toLowerCase());
+});
 
   if (loading) return <LoadingSpinner />;
 

@@ -103,7 +103,7 @@ class Contract(Base):
 
     status = Column(
         String,
-        default="Draft"
+        default="PENDING"
     )
 
     created_at = Column(DateTime)
@@ -178,9 +178,9 @@ class Material(Base):
 
     quantity_needed = Column(Integer)
 
-    packaging_status = Column(String, default="Pending")
+    packaging_status = Column(String, default="PENDING")
 
-    shipping_status = Column(String, default="Pending")
+    shipping_status = Column(String, default="PENDING")
 
     shipping_date = Column(DateTime)
 
@@ -199,9 +199,9 @@ class MaterialRequest(Base):
 
     quantity_needed = Column(Integer)
 
-    packaging_status = Column(String, default="Pending")
+    packaging_status = Column(String, default="PENDING")
 
-    shipping_status = Column(String, default="Pending")
+    shipping_status = Column(String, default="PENDING")
 
     shipping_date = Column(DateTime)
 
@@ -229,12 +229,12 @@ class MaterialShipment(Base):
 
     packaging_status = Column(
         String,
-        default="Pending"
+        default="PENDING"
     )
 
     shipping_status = Column(
         String,
-        default="Pending"
+        default="PENDING"
     )
 
     material_request = relationship(
