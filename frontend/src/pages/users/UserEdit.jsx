@@ -18,7 +18,6 @@ export default function UserEdit() {
   const [formData, setFormData] = useState({
     full_name: "",
     username: "",
-    email: "",
     password: "",
     role: "",
   });

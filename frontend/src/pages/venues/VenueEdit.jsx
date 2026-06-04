@@ -23,7 +23,10 @@ export default function VenueEdit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await venueService.update(id, formData);
+      const payload = { ...formData };
+      if (payload.capacity === "") payload.capacity = 0;
+      if (payload.rental_cost === "") payload.rental_cost = 0;
+      await venueService.update(id, payload);
       navigate("/venues");
     } catch (err) {
       alert(err.response?.data?.detail || err.message);

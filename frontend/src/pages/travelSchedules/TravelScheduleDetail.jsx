@@ -9,6 +9,32 @@ export default function TravelScheduleDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const userRole = localStorage.getItem("role") || "";
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      setUploading(true);
+      const token = localStorage.getItem("access_token");
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`http://localhost:8000/travel-schedules/${id}/upload-confirmation`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+      if (!res.ok) throw new Error("Failed to upload file");
+      alert("File uploaded and schedule confirmed!");
+      loadData();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload file.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -36,7 +62,13 @@ export default function TravelScheduleDetail() {
           <p className="page-subtitle">Travel Schedule Overview</p>
           <h1>Schedule #{id}</h1>
         </div>
-        <div className="page-header-actions">
+        <div className="page-header-actions" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          {["Admin", "Logistics Coordinator", "Booking Staff"].includes(userRole) && (
+            <label className="btn btn-outline" style={{ cursor: "pointer", margin: 0 }}>
+              {uploading ? "Uploading..." : "📎 Upload Confirmation"}
+              <input type="file" style={{ display: "none" }} onChange={handleFileUpload} disabled={uploading} accept=".pdf,.doc,.docx" />
+            </label>
+          )}
           <button
             className="btn btn-outline"
             onClick={() => navigate(`/travel-schedules/edit/${id}`)}
@@ -81,6 +113,14 @@ export default function TravelScheduleDetail() {
             <div className="detail-field">
               <span className="detail-field-label">Travel Info</span>
               <span className="detail-field-value">{travel_schedule.travel_info}</span>
+            </div>
+          )}
+          {travel_schedule.confirmation_file && (
+            <div className="detail-field">
+              <span className="detail-field-label">Confirmation File</span>
+              <span className="detail-field-value" style={{ color: "var(--primary-color)" }}>
+                {travel_schedule.confirmation_file.split('/').pop()}
+              </span>
             </div>
           )}
         </div>

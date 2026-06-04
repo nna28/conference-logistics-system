@@ -26,6 +26,7 @@ class MaterialRequestResponse(BaseModel):
     shipping_status: Optional[str] = None
     shipping_date: Optional[datetime] = None
     created_at: Optional[datetime] = None
+    delivery_address: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -10,7 +10,7 @@ class WorkshopCreate(BaseModel):
     expected_attendees: Optional[int] = None
     city: Optional[str] = None
     trainer_id: Optional[int] = None
-    status: Optional[str] = "Pending"
+    status: Optional[str] = "PENDING"
 
 
 class WorkshopUpdate(BaseModel):

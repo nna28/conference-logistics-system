@@ -11,15 +11,20 @@ export default function VenueCreate() {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
-    contact_phone: "",
-    description: "",
-    sales_manager_id: "",
+    room_type: "",
+    capacity: "",
+    rental_cost: "",
+    equipment_supported: "",
+    is_available: true,
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await venueService.create(formData);
+      const payload = { ...formData };
+      if (payload.capacity === "") payload.capacity = 0;
+      if (payload.rental_cost === "") payload.rental_cost = 0;
+      await venueService.create(payload);
       navigate("/venues");
     } catch (err) {
       alert(err.response?.data?.detail || err.message);

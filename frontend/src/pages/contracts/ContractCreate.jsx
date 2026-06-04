@@ -16,7 +16,11 @@ export default function ContractCreate() {
   const [formData, setFormData] = useState({
     workshop_id: "",
     venue_id: "",
-    contract_info: "",
+    sales_manager_id: "",
+    meeting_rooms: "",
+    seating_style: "",
+    av_requirements: "",
+    revision_notes: "",
   });
 
   const handleSubmit = async (e) => {
@@ -28,7 +32,11 @@ export default function ContractCreate() {
       await contractService.create({
         workshop_id: Number(formData.workshop_id),
         venue_id: Number(formData.venue_id),
-        contract_info: formData.contract_info,
+        sales_manager_id: formData.sales_manager_id ? Number(formData.sales_manager_id) : null,
+        meeting_rooms: formData.meeting_rooms ? Number(formData.meeting_rooms) : null,
+        seating_style: formData.seating_style || null,
+        av_requirements: formData.av_requirements || null,
+        revision_notes: formData.revision_notes || null,
       });
 
       navigate("/contracts");

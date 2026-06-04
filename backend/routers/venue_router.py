@@ -28,16 +28,33 @@ router = APIRouter(
 )
 
 
+from typing import Optional
+
 @router.get(
     "/",
     response_model=list[VenueResponse]
 )
 def get_venues(
+    city: Optional[str] = None,
+    room_type: Optional[str] = None,
+    max_cost: Optional[int] = None,
+    min_capacity: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
-    return db.query(
-        Venue
-    ).all()
+    query = db.query(Venue)
+    
+    if city:
+        query = query.filter(Venue.address.ilike(f"%{city}%"))
+    if room_type:
+        query = query.filter(Venue.room_type.ilike(f"%{room_type}%"))
+    if min_capacity is not None:
+        query = query.filter(Venue.capacity >= min_capacity)
+    if max_cost is not None:
+        query = query.filter(Venue.rental_cost <= max_cost)
+    
+    venues = query.all()
+
+    return venues
 
 
 @router.get(
@@ -104,7 +121,7 @@ def create_venue(
         room_type=request.room_type,
         equipment_supported=request.equipment_supported,
         capacity=request.capacity,
-        is_available=request.is_available if request.is_available is not None else 1,
+        is_available=request.is_available if request.is_available is not None else True,
     )
 
     db.add(venue)

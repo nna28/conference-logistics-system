@@ -38,18 +38,6 @@ export default function UserForm({
         </div>
 
         <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter email address"
-            value={formData.email || ""}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-group">
           <label>Role</label>
           <select
             name="role"

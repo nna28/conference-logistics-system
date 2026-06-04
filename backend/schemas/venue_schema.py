@@ -9,7 +9,7 @@ class VenueCreate(BaseModel):
     room_type: Optional[str] = None
     equipment_supported: Optional[str] = None
     capacity: Optional[int] = None
-    is_available: Optional[int] = 1
+    is_available: Optional[bool] = True
 
 
 class VenueUpdate(BaseModel):
@@ -19,7 +19,7 @@ class VenueUpdate(BaseModel):
     room_type: Optional[str] = None
     equipment_supported: Optional[str] = None
     capacity: Optional[int] = None
-    is_available: Optional[int] = None
+    is_available: Optional[bool] = None
 
 
 class VenueResponse(BaseModel):
@@ -30,7 +30,7 @@ class VenueResponse(BaseModel):
     room_type: Optional[str] = None
     equipment_supported: Optional[str] = None
     capacity: Optional[int] = None
-    is_available: Optional[int] = None
+    is_available: Optional[bool] = None
 
     class Config:
         from_attributes = True

@@ -26,6 +26,11 @@ const contractService = {
     return res.data;
   },
 
+  updateStatus: async (id, status) => {
+    const res = await api.put(`/contracts/${id}`, { status });
+    return res.data;
+  },
+
   delete: async (id) => {
     const res = await api.delete(`/contracts/${id}`);
     return res.data;

@@ -1,8 +1,13 @@
 import api from "../api/axios";
 
 const venueService = {
-  getAll: async () => {
-    const res = await api.get("/venues/");
+  getAll: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.city) params.append("city", filters.city);
+    if (filters.room_type) params.append("room_type", filters.room_type);
+    if (filters.max_cost) params.append("max_cost", filters.max_cost);
+    if (filters.min_capacity) params.append("min_capacity", filters.min_capacity);
+    const res = await api.get(`/venues/?${params.toString()}`);
     return res.data;
   },
 

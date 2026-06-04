@@ -26,9 +26,12 @@ export default function MaterialRequestCreate() {
     try {
       setLoading(true);
 
-      await materialRequestService.create(
-        formData
-      );
+      const payload = { ...formData };
+      if (payload.workshop_id === "") payload.workshop_id = null;
+      if (payload.request_date === "") payload.request_date = null;
+      if (payload.registered_attendees === "") payload.registered_attendees = null;
+
+      await materialRequestService.create(payload);
 
       navigate("/material-requests");
     } finally {

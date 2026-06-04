@@ -37,7 +37,7 @@ router = APIRouter(
 @router.get(
     "/",
     response_model=list[WorkshopResponse],
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator"))]
+    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager"))]
 )
 def get_workshops(
     db: Session = Depends(get_db)
@@ -50,7 +50,7 @@ def get_workshops(
 @router.get(
     "/{workshop_id}",
     response_model=WorkshopResponse,
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator"))]
+    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager"))]
 )
 def get_workshop(
     workshop_id: int,
@@ -73,7 +73,7 @@ def get_workshop(
 
 @router.get(
     "/{workshop_id}/overview",
-    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator"))]
+    dependencies=[Depends(require_role("Admin", "Booking Staff", "Consultant", "Logistics Coordinator", "Sales Manager"))]
 )
 def get_workshop_overview(
     workshop_id: int,
@@ -239,7 +239,7 @@ def create_workshop(
         expected_attendees=request.expected_attendees,
         city=request.city,
         trainer_id=request.trainer_id,
-        status=request.status or "Pending"
+        status=request.status or "PENDING"
     )
 
     db.add(workshop)

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+import os
 from sqlalchemy.orm import Session
 
 from db.database import get_db
@@ -211,7 +212,7 @@ def update_travel_schedule(
 
 
 @router.delete("/{schedule_id}")
-def delete_travel_schedule(
+def delete_schedule(
     schedule_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(
@@ -221,21 +222,22 @@ def delete_travel_schedule(
     schedule = db.query(
         TravelSchedule
     ).filter(
-        TravelSchedule.id == schedule_id
+        TravelSchedule.id ==
+        schedule_id
     ).first()
 
     if not schedule:
         raise HTTPException(
             status_code=404,
-            detail="Travel schedule not found"
+            detail="Schedule not found"
         )
 
     create_audit_log(
-            db,
-            current_user.id,
-            "DELETE",
-            f"Travel Schedule #{schedule.id}"
-        )
+        db,
+        current_user.id,
+        "DELETE",
+        f"TravelSchedule #{schedule.id}"
+    )
 
     db.delete(schedule)
 
@@ -243,5 +245,40 @@ def delete_travel_schedule(
 
     return {
         "message":
-        "Travel schedule deleted successfully"
+        "Schedule deleted successfully"
     }
+
+@router.post("/{schedule_id}/upload-confirmation")
+async def upload_confirmation(
+    schedule_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    schedule = db.query(TravelSchedule).filter(TravelSchedule.id == schedule_id).first()
+    if not schedule:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+
+    # Create uploads directory if it doesn't exist
+    os.makedirs("uploads", exist_ok=True)
+    
+    file_path = f"uploads/travel_confirm_{schedule_id}_{file.filename}"
+    
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+        
+    schedule.confirmation_file = file_path
+    schedule.status = "Confirmed"
+    
+    db.commit()
+    db.refresh(schedule)
+    
+    create_audit_log(
+        db,
+        current_user.id,
+        "UPDATE",
+        f"Uploaded confirmation for TravelSchedule #{schedule.id}"
+    )
+    
+    return {"message": "File uploaded and schedule confirmed", "file_path": file_path}

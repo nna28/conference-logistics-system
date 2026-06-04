@@ -56,8 +56,8 @@ export default function MaterialRequestDetail() {
           <div className="detail-field">
             <span className="detail-field-label">Request Date</span>
             <span className="detail-field-value">
-              {material_request.request_date
-                ? new Date(material_request.request_date).toLocaleString()
+              {material_request.created_at
+                ? new Date(material_request.created_at).toLocaleString()
                 : "—"}
             </span>
           </div>
@@ -66,14 +66,22 @@ export default function MaterialRequestDetail() {
             <span className="detail-field-value">{material_request.delivery_address || "—"}</span>
           </div>
           <div className="detail-field">
-            <span className="detail-field-label">Registered Attendees</span>
-            <span className="detail-field-value">{material_request.registered_attendees}</span>
+            <span className="detail-field-label">Quantity Needed</span>
+            <span className="detail-field-value">{material_request.quantity_needed}</span>
           </div>
           <div className="detail-field">
-            <span className="detail-field-label">Status</span>
+            <span className="detail-field-label">Packaging Status</span>
             <span className="detail-field-value">
-              <span className={`badge badge-${(material_request.status || "pending").toLowerCase()}`}>
-                {material_request.status}
+              <span className={`badge badge-${(material_request.packaging_status || "pending").toLowerCase()}`}>
+                {material_request.packaging_status || "Pending"}
+              </span>
+            </span>
+          </div>
+          <div className="detail-field">
+            <span className="detail-field-label">Shipping Status</span>
+            <span className="detail-field-value">
+              <span className={`badge badge-${(material_request.shipping_status || "pending").toLowerCase()}`}>
+                {material_request.shipping_status || "Pending"}
               </span>
             </span>
           </div>

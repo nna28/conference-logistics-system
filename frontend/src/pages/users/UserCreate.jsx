@@ -16,7 +16,6 @@ export default function UserCreate() {
   const [formData, setFormData] = useState({
     full_name: "",
     username: "",
-    email: "",
     password: "",
     role: "",
   });

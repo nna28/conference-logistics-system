@@ -6,6 +6,7 @@ from db.database import get_db
 from models.models import (
     MaterialRequest,
     Workshop,
+    Contract,
     User
 )
 
@@ -36,9 +37,11 @@ router = APIRouter(
 def get_material_requests(
     db: Session = Depends(get_db)
 ):
-    return db.query(
-        MaterialRequest
-    ).all()
+    reqs = db.query(MaterialRequest).all()
+    for r in reqs:
+        c = db.query(Contract).filter(Contract.workshop_id == r.workshop_id).first()
+        r.delivery_address = c.venue.address if (c and c.venue) else None
+    return reqs
 
 
 @router.get(
@@ -60,6 +63,9 @@ def get_material_request(
             status_code=404,
             detail="Material request not found"
         )
+        
+    c = db.query(Contract).filter(Contract.workshop_id == request.workshop_id).first()
+    request.delivery_address = c.venue.address if (c and c.venue) else None
 
     return request
 
@@ -116,9 +122,11 @@ def create_material_request(
             detail="Workshop not found"
         )
 
+    calc_qty = workshop.expected_attendees if workshop.expected_attendees else request.quantity_needed
+
     material_request = MaterialRequest(
         workshop_id=request.workshop_id,
-        quantity_needed=request.quantity_needed,
+        quantity_needed=calc_qty,
         packaging_status=request.packaging_status or "Pending",
         shipping_status=request.shipping_status or "Pending",
         shipping_date=request.shipping_date,

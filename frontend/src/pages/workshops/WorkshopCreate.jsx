@@ -13,12 +13,22 @@ function WorkshopCreate() {
     workshop_type: "",
     scheduled_time: "",
     expected_attendees: "",
-    consultant_id: "",
+    trainer_id: "",
+    city: "",
+    status: "PENDING",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await workshopService.create(formData);
+    const payload = { ...formData };
+    if (payload.expected_attendees === "") payload.expected_attendees = null;
+    if (payload.trainer_id === "") payload.trainer_id = null;
+    if (payload.scheduled_time === "") payload.scheduled_time = null;
+    if (!payload.workshop_code) {
+      payload.workshop_code = "WS-" + Date.now().toString().slice(-6);
+    }
+
+    await workshopService.create(payload);
     navigate("/workshops");
   };
 

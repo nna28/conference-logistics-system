@@ -18,7 +18,11 @@ export default function ContractEdit() {
   const [formData, setFormData] = useState({
     workshop_id: "",
     venue_id: "",
-    contract_info: "",
+    sales_manager_id: "",
+    meeting_rooms: "",
+    seating_style: "",
+    av_requirements: "",
+    revision_notes: "",
     status: "Draft",
   });
 
@@ -42,7 +46,11 @@ export default function ContractEdit() {
       setLoading(true);
 
       await contractService.update(id, {
-        contract_info: formData.contract_info,
+        sales_manager_id: formData.sales_manager_id ? Number(formData.sales_manager_id) : null,
+        meeting_rooms: formData.meeting_rooms ? Number(formData.meeting_rooms) : null,
+        seating_style: formData.seating_style || null,
+        av_requirements: formData.av_requirements || null,
+        revision_notes: formData.revision_notes || null,
         status: formData.status,
       });
 
@@ -69,6 +77,7 @@ export default function ContractEdit() {
         onSubmit={handleSubmit}
         submitLabel="Save Changes"
         loading={loading}
+        isEdit={true}
       />
     </>
   );

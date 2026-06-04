@@ -9,17 +9,16 @@ from core.dependencies import require_role
 
 router = APIRouter(
     prefix="/users",
-    tags=["Users"],
-    dependencies=[Depends(require_role("Admin"))]
+    tags=["Users"]
 )
 
 
-@router.get("/", response_model=list[UserResponse])
+@router.get("/", response_model=list[UserResponse], dependencies=[Depends(require_role("Admin", "Booking Staff", "Sales Manager"))])
 def get_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserResponse, dependencies=[Depends(require_role("Admin", "Booking Staff", "Sales Manager"))])
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -27,7 +26,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/", response_model=UserResponse)
+@router.post("/", response_model=UserResponse, dependencies=[Depends(require_role("Admin"))])
 def create_user(request: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.username == request.username).first()
     if existing:
@@ -38,7 +37,7 @@ def create_user(request: UserCreate, db: Session = Depends(get_db)):
         username=request.username,
         hashed_password=hash_password(request.password),
         role=request.role,
-        is_active=1,
+        is_active=True,
     )
     db.add(user)
     db.commit()
@@ -46,7 +45,7 @@ def create_user(request: UserCreate, db: Session = Depends(get_db)):
     return user
 
 
-@router.put("/{user_id}", response_model=UserResponse)
+@router.put("/{user_id}", response_model=UserResponse, dependencies=[Depends(require_role("Admin"))])
 def update_user(user_id: int, request: UserUpdate, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -66,7 +65,7 @@ def update_user(user_id: int, request: UserUpdate, db: Session = Depends(get_db)
     return user
 
 
-@router.delete("/{user_id}")
+@router.delete("/{user_id}", dependencies=[Depends(require_role("Admin"))])
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:

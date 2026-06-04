@@ -21,7 +21,12 @@ function WorkshopEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await workshopService.update(id, formData);
+    const payload = { ...formData };
+    if (payload.expected_attendees === "") payload.expected_attendees = null;
+    if (payload.trainer_id === "") payload.trainer_id = null;
+    if (payload.scheduled_time === "") payload.scheduled_time = null;
+
+    await workshopService.update(id, payload);
     navigate("/workshops");
   };
 
@@ -41,6 +46,7 @@ function WorkshopEdit() {
         setFormData={setFormData}
         onSubmit={handleSubmit}
         submitText="Update Workshop"
+        isEdit={true}
       />
     </>
   );

@@ -43,27 +43,10 @@ export default function MaterialRequestForm({
             />
           </div>
 
-          <div className="form-group full-width">
-            <label>Delivery Address</label>
-            <input
-              name="delivery_address"
-              value={formData.delivery_address || ""}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Registered Attendees</label>
-            <input
-              type="number"
-              name="registered_attendees"
-              value={
-                formData.registered_attendees || ""
-              }
-              onChange={handleChange}
-              required
-            />
+          <div className="form-group full-width" style={{ padding: "12px", background: "var(--bg-card-hover)", borderRadius: "8px", border: "1px dashed var(--border-color)" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "14px", margin: 0 }}>
+              ℹ️ <strong>Note:</strong> Delivery Address and Quantity will be automatically calculated based on the Workshop's Venue Contract and Expected Attendees.
+            </p>
           </div>
 
           {"status" in formData && (

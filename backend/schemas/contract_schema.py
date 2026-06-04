@@ -34,8 +34,10 @@ class ContractResponse(BaseModel):
     seating_style: Optional[str] = None
     av_requirements: Optional[str] = None
     revision_notes: Optional[str] = None
+    pending_review_by: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    approved_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

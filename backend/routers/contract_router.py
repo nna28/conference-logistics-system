@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 
 from db.database import get_db
 
@@ -196,6 +197,11 @@ def update_contract(
             key,
             value
         )
+
+    # Auto-set timestamps on status change
+    contract.updated_at = datetime.now(timezone.utc)
+    if update_data.get("status") == "Approved" and not contract.approved_at:
+        contract.approved_at = datetime.now(timezone.utc)
 
     db.commit()
 

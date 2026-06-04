@@ -5,7 +5,8 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Text,
-    Boolean
+    Boolean,
+    Float
 )
 
 from sqlalchemy.orm import relationship
@@ -29,7 +30,7 @@ class User(Base):
 
     role = Column(String)
 
-    is_active = Column(Integer, default=1)
+    is_active = Column(Boolean, default=True)
 
 
 class Workshop(Base):
@@ -49,7 +50,7 @@ class Workshop(Base):
 
     status = Column(
         String,
-        default="Pending"
+        default="PENDING"
     )
 
     trainer_id = Column(
@@ -69,13 +70,13 @@ class Venue(Base):
 
     address = Column(String)
 
-    rental_cost = Column(String)
+    rental_cost = Column(Float)
 
     room_type = Column(String)
 
     equipment_supported = Column(String)
 
-    is_available = Column(Integer, default=1)
+    is_available = Column(Boolean, default=True)
 
     capacity = Column(Integer)
 

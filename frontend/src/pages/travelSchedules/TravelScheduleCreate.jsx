@@ -29,7 +29,11 @@ export default function TravelScheduleCreate() {
     try {
       setLoading(true);
 
-      await travelScheduleService.create(formData);
+      const payload = { ...formData };
+      if (payload.workshop_id === "") payload.workshop_id = null;
+      if (payload.consultant_id === "") payload.consultant_id = null;
+      if (payload.departure_time === "") payload.departure_time = null;
+      await travelScheduleService.create(payload);
 
       navigate("/travel-schedules");
     } catch (error) {
