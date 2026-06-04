@@ -1,0 +1,12 @@
+:root {
+    --primary: #111827;
+    --secondary: #6B7280;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+
+    --bg: #F9FAFB;
+    --card: #FFFFFF;
+
+    --radius: 16px;
+}

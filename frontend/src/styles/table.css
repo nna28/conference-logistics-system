@@ -1,0 +1,22 @@
+.table-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: #F9FAFB;
+    padding: 14px;
+    text-align: left;
+}
+
+.data-table td {
+    padding: 14px;
+    border-top: 1px solid #E5E7EB;
+}
