@@ -1,71 +1,62 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import BackButton from "../../components/layout/BackButton";
-import PageHeader from "../../components/layout/PageHeader";
-
 import userService from "../../services/userService";
 
 export default function UserDetail() {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    loadUser();
-  }, []);
+    userService.getById(id).then(setUser).catch(console.error);
+  }, [id]);
 
-  const loadUser = async () => {
-    try {
-      const data =
-        await userService.getById(id);
-
-      setUser(data);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  if (!user) {
-    return <p>Loading...</p>;
-  }
+  if (!user) return null;
 
   return (
     <>
       <BackButton />
 
-      <PageHeader
-        title={user.full_name}
-        subtitle="User Detail"
-      />
+      <div className="page-header" style={{ marginBottom: "24px" }}>
+        <div className="page-header-left">
+          <p className="page-subtitle">Users</p>
+          <h1>{user.full_name}</h1>
+        </div>
+        <div className="page-header-actions">
+          <button className="btn btn-outline" onClick={() => navigate(`/users/edit/${id}`)}>
+            ✏️ Edit
+          </button>
+        </div>
+      </div>
 
-      <div className="detail-card">
-
-        <p>
-          <strong>ID:</strong>{" "}
-          {user.id}
-        </p>
-
-        <p>
-          <strong>Full Name:</strong>{" "}
-          {user.full_name}
-        </p>
-
-        <p>
-          <strong>Username:</strong>{" "}
-          {user.username}
-        </p>
-
-        <p>
-          <strong>Email:</strong>{" "}
-          {user.email}
-        </p>
-
-        <p>
-          <strong>Role:</strong>{" "}
-          {user.role}
-        </p>
-
+      <div className="detail-card" style={{ maxWidth: "600px" }}>
+        <h3>User Information</h3>
+        <div className="detail-field">
+          <span className="detail-field-label">ID</span>
+          <span className="detail-field-value">#{user.id}</span>
+        </div>
+        <div className="detail-field">
+          <span className="detail-field-label">Full Name</span>
+          <span className="detail-field-value" style={{ fontWeight: 600 }}>{user.full_name}</span>
+        </div>
+        <div className="detail-field">
+          <span className="detail-field-label">Username</span>
+          <span className="detail-field-value">{user.username}</span>
+        </div>
+        <div className="detail-field">
+          <span className="detail-field-label">Email</span>
+          <span className="detail-field-value">{user.email}</span>
+        </div>
+        <div className="detail-field">
+          <span className="detail-field-label">Role</span>
+          <span className="detail-field-value">
+            <span className="badge" style={{ background: "var(--blue-light)", color: "var(--blue)" }}>
+              {user.role}
+            </span>
+          </span>
+        </div>
       </div>
     </>
   );

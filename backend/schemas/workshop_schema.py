@@ -1,30 +1,36 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 class WorkshopCreate(BaseModel):
     workshop_code: str
     workshop_type: str
-    scheduled_time: datetime
-    expected_attendees: int
-    consultant_id: int
+    scheduled_time: Optional[datetime] = None
+    expected_attendees: Optional[int] = None
+    city: Optional[str] = None
+    trainer_id: Optional[int] = None
+    status: Optional[str] = "Pending"
 
 
 class WorkshopUpdate(BaseModel):
-    workshop_type: str | None = None
-    scheduled_time: datetime | None = None
-    expected_attendees: int | None = None
-    status: str | None = None
+    workshop_type: Optional[str] = None
+    scheduled_time: Optional[datetime] = None
+    expected_attendees: Optional[int] = None
+    city: Optional[str] = None
+    status: Optional[str] = None
+    trainer_id: Optional[int] = None
 
 
 class WorkshopResponse(BaseModel):
     id: int
     workshop_code: str
-    workshop_type: str
-    scheduled_time: datetime
-    expected_attendees: int
-    status: str
-    consultant_id: int
+    workshop_type: Optional[str] = None
+    scheduled_time: Optional[datetime] = None
+    expected_attendees: Optional[int] = None
+    city: Optional[str] = None
+    status: Optional[str] = None
+    trainer_id: Optional[int] = None
 
     class Config:
         from_attributes = True

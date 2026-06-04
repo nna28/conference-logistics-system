@@ -6,88 +6,90 @@ function WorkshopForm({
   onSubmit,
   submitText = "Save",
 }) {
+  const set = (key) => (e) =>
+    setFormData({ ...formData, [key]: e.target.value });
+
   return (
     <form onSubmit={onSubmit} className="form-card">
+
       <div className="form-grid">
 
-        <div>
+        <div className="form-group">
           <label>Workshop Code</label>
-
           <input
             type="text"
-            value={formData.workshop_code}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                workshop_code: e.target.value,
-              })
-            }
+            placeholder="e.g. WS-2024-001"
+            value={formData.workshop_code || ""}
+            onChange={set("workshop_code")}
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Workshop Type</label>
-
           <input
             type="text"
-            value={formData.workshop_type}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                workshop_type: e.target.value,
-              })
-            }
+            placeholder="e.g. Technical, Sales"
+            value={formData.workshop_type || ""}
+            onChange={set("workshop_type")}
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Scheduled Time</label>
-
           <input
             type="datetime-local"
-            value={formData.scheduled_time}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                scheduled_time: e.target.value,
-              })
-            }
+            value={formData.scheduled_time || ""}
+            onChange={set("scheduled_time")}
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Expected Attendees</label>
-
           <input
             type="number"
-            value={formData.expected_attendees}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                expected_attendees: e.target.value,
-              })
-            }
+            placeholder="e.g. 50"
+            value={formData.expected_attendees || ""}
+            onChange={set("expected_attendees")}
           />
         </div>
 
-        <div>
-          <label>Consultant ID</label>
-
+        <div className="form-group">
+          <label>Trainer ID</label>
           <input
             type="number"
-            value={formData.consultant_id}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                consultant_id: e.target.value,
-              })
-            }
+            placeholder="User ID of trainer"
+            value={formData.trainer_id || ""}
+            onChange={set("trainer_id")}
           />
+        </div>
+
+        <div className="form-group">
+          <label>City</label>
+          <input
+            type="text"
+            placeholder="e.g. HCM, HN"
+            value={formData.city || ""}
+            onChange={set("city")}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Status</label>
+          <select
+            value={formData.status || "PENDING"}
+            onChange={set("status")}
+          >
+            <option value="PENDING">PENDING</option>
+            <option value="PROCESSING">PROCESSING</option>
+            <option value="CONFIRMED">CONFIRMED</option>
+            <option value="COMPLETED">COMPLETED</option>
+            <option value="CANCELLED">CANCELLED</option>
+          </select>
         </div>
 
       </div>
 
-      <FormActions submitText={submitText} />
+      <FormActions submitLabel={submitText} />
     </form>
   );
 }

@@ -37,7 +37,7 @@ export default function VenueForm({
           />
         </div>
 
-        <div className="form-group full-width">
+        <div className="form-group full">
           <label>Address</label>
           <input
             name="address"
@@ -47,7 +47,7 @@ export default function VenueForm({
           />
         </div>
 
-        <div className="form-group full-width">
+        <div className="form-group full">
           <label>Description</label>
           <textarea
             rows="4"

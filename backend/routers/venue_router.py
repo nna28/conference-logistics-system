@@ -80,18 +80,9 @@ def get_venue_overview(
             detail="Venue not found"
         )
 
-    sales_manager = None
-
-    if venue.sales_manager_id:
-        sales_manager = db.query(
-            User
-        ).filter(
-            User.id == venue.sales_manager_id
-        ).first()
-
     return {
         "venue": venue,
-        "sales_manager": sales_manager
+        "sales_manager": None
     }
 
 
@@ -106,24 +97,14 @@ def create_venue(
         get_current_user
     )
 ):
-    manager = db.query(
-        User
-    ).filter(
-        User.id == request.sales_manager_id
-    ).first()
-
-    if not manager:
-        raise HTTPException(
-            status_code=404,
-            detail="Sales manager not found"
-        )
-
     venue = Venue(
         name=request.name,
         address=request.address,
-        contact_phone=request.contact_phone,
-        description=request.description,
-        sales_manager_id=request.sales_manager_id
+        rental_cost=request.rental_cost,
+        room_type=request.room_type,
+        equipment_supported=request.equipment_supported,
+        capacity=request.capacity,
+        is_available=request.is_available if request.is_available is not None else 1,
     )
 
     db.add(venue)

@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import workshopService from "../../services/workshopService";
-
 import WorkshopForm from "../../components/workshop/WorkshopForm";
 import BackButton from "../../components/layout/BackButton";
-import PageHeader from "../../components/layout/PageHeader";
 
 function WorkshopCreate() {
   const navigate = useNavigate();
@@ -20,9 +18,7 @@ function WorkshopCreate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     await workshopService.create(formData);
-
     navigate("/workshops");
   };
 
@@ -30,15 +26,18 @@ function WorkshopCreate() {
     <>
       <BackButton />
 
-      <PageHeader
-        title="Create Workshop"
-      />
+      <div className="page-header" style={{ marginBottom: "24px" }}>
+        <div className="page-header-left">
+          <p className="page-subtitle">Workshops</p>
+          <h1>Create New Workshop</h1>
+        </div>
+      </div>
 
       <WorkshopForm
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleSubmit}
-        submitText="Create"
+        submitText="Create Workshop"
       />
     </>
   );

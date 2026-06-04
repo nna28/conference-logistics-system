@@ -6,14 +6,9 @@ import authService from "../services/authService";
 export default function Login() {
   const navigate = useNavigate();
 
-  const [username, setUsername] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,37 +16,17 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const result =
-        await authService.login(
-          username,
-          password
-        );
+      const result = await authService.login(username, password);
 
-      localStorage.setItem(
-        "token",
-        result.access_token
-      );
+      localStorage.setItem("token", result.access_token);
+      localStorage.setItem("user_id", result.user_id);
+      localStorage.setItem("full_name", result.full_name);
+      localStorage.setItem("role", result.role);
 
-      localStorage.setItem(
-        "user_id",
-        result.user_id
-      );
-
-      localStorage.setItem(
-        "full_name",
-        result.full_name
-      );
-
-      localStorage.setItem(
-        "role",
-        result.role
-      );
-
-      navigate("/workshops");
+      navigate("/dashboard");
     } catch (error) {
       alert(
-        error.response?.data?.detail ||
-        "Login failed"
+        error.response?.data?.detail || "Login failed"
       );
     } finally {
       setLoading(false);
@@ -61,56 +36,66 @@ export default function Login() {
   return (
     <div className="login-page">
 
-      <div className="login-card">
+      {/* Left panel */}
+      <div className="login-left">
+        <div className="login-left-content">
+          <div className="login-left-logo">🏛️</div>
+          <h1>Conference Logistics System</h1>
+          <p>
+            Manage workshops, venues, contracts, travel schedules,
+            and material shipments — all in one place.
+          </p>
+        </div>
+      </div>
 
-        <h1>
-          Conference Logistics System
-        </h1>
+      {/* Right panel */}
+      <div className="login-right">
+        <div className="login-form-wrapper">
 
-        <form onSubmit={handleSubmit}>
-
-          <div className="form-group">
-            <label>
-              Username
-            </label>
-
-            <input
-              value={username}
-              onChange={(e) =>
-                setUsername(
-                  e.target.value
-                )
-              }
-            />
+          <div className="login-form-header">
+            <p className="welcome-text">Welcome back 👋</p>
+            <h2>Sign in to your account</h2>
           </div>
 
-          <div className="form-group">
-            <label>
-              Password
-            </label>
+          <form className="login-form" onSubmit={handleSubmit}>
 
-            <input
-              type="password"
-              value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading
-              ? "Signing In..."
-              : "Sign In"}
-          </button>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </div>
 
-        </form>
+            <button
+              type="submit"
+              className="login-submit"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
 
+          </form>
+
+        </div>
       </div>
 
     </div>

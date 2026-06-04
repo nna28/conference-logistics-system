@@ -1,57 +1,65 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
-import BackButton from "../../components/layout/BackButton";
-import PageHeader from "../../components/layout/PageHeader";
+import { useParams, useNavigate } from "react-router-dom";
 
 import materialService from "../../services/materialService";
+import BackButton from "../../components/layout/BackButton";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function MaterialDetail() {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [material, setMaterial] = useState(null);
 
   useEffect(() => {
     loadMaterial();
-  }, []);
+  }, [id]);
 
   const loadMaterial = async () => {
-    const data =
-      await materialService.getById(id);
-
-    setMaterial(data);
+    try {
+      const data = await materialService.getById(id);
+      setMaterial(data);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  if (!material) {
-    return <p>Loading...</p>;
-  }
+  if (!material) return <LoadingSpinner />;
 
   return (
     <>
       <BackButton />
 
-      <PageHeader
-        title={material.material_name}
-        subtitle="Material Detail"
-      />
+      <div className="page-header" style={{ marginBottom: "24px" }}>
+        <div className="page-header-left">
+          <p className="page-subtitle">Material Detail</p>
+          <h1>{material.material_name}</h1>
+        </div>
+        <div className="page-header-actions">
+          <button
+            className="btn btn-outline"
+            onClick={() => navigate(`/materials/edit/${id}`)}
+          >
+            ✏️ Edit
+          </button>
+        </div>
+      </div>
 
       <div className="detail-card">
-
-        <p>
-          <strong>ID:</strong>{" "}
-          {material.id}
-        </p>
-
-        <p>
-          <strong>Name:</strong>{" "}
-          {material.material_name}
-        </p>
-
-        <p>
-          <strong>Type:</strong>{" "}
-          {material.material_type}
-        </p>
-
+        <h3>Material Info</h3>
+        <div className="detail-field">
+          <span className="detail-field-label">ID</span>
+          <span className="detail-field-value">#{material.id}</span>
+        </div>
+        <div className="detail-field">
+          <span className="detail-field-label">Name</span>
+          <span className="detail-field-value">{material.material_name}</span>
+        </div>
+        <div className="detail-field">
+          <span className="detail-field-label">Type</span>
+          <span className="detail-field-value">
+            <span className="badge badge-draft">{material.material_type}</span>
+          </span>
+        </div>
       </div>
     </>
   );

@@ -3,9 +3,9 @@ import { useState } from "react";
 
 import VenueForm from "../../components/venue/VenueForm";
 import venueService from "../../services/venueService";
+import BackButton from "../../components/layout/BackButton";
 
 export default function VenueCreate() {
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -18,23 +18,31 @@ export default function VenueCreate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       await venueService.create(formData);
-
       navigate("/venues");
-
     } catch (err) {
       alert(err.response?.data?.detail || err.message);
     }
   };
 
   return (
-    <VenueForm
-      formData={formData}
-      setFormData={setFormData}
-      onSubmit={handleSubmit}
-      submitText="Create Venue"
-    />
+    <>
+      <BackButton />
+
+      <div className="page-header" style={{ marginBottom: "24px" }}>
+        <div className="page-header-left">
+          <p className="page-subtitle">Venues</p>
+          <h1>Create New Venue</h1>
+        </div>
+      </div>
+
+      <VenueForm
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleSubmit}
+        submitText="Create Venue"
+      />
+    </>
   );
 }

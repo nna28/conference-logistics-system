@@ -7,6 +7,8 @@ import {
 
 import MainLayout from "./components/layout/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleGuard from "./components/auth/RoleGuard";
+
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -103,169 +105,297 @@ function App() {
           {/* Users */}
           <Route
             path="/users"
-            element={<UserList />}
+            element={
+              <RoleGuard allowedRoles={["Admin"]}>
+                <UserList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/users/new"
-            element={<UserCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin"]}>
+                <UserCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/users/edit/:id"
-            element={<UserEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin"]}>
+                <UserEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/users/:id"
-            element={<UserDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin"]}>
+                <UserDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Workshops */}
           <Route
             path="/workshops"
-            element={<WorkshopList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+                <WorkshopList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/workshops/new"
-            element={<WorkshopCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+                <WorkshopCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/workshops/edit/:id"
-            element={<WorkshopEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+                <WorkshopEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/workshops/:id"
-            element={<WorkshopDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Consultant", "Logistics Coordinator"]}>
+                <WorkshopDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Venues */}
           <Route
             path="/venues"
-            element={<VenueList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+                <VenueList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/venues/new"
-            element={<VenueCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+                <VenueCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/venues/edit/:id"
-            element={<VenueEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+                <VenueEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/venues/:id"
-            element={<VenueDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Sales Manager"]}>
+                <VenueDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Contracts */}
           <Route
             path="/contracts"
-            element={<ContractList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+                <ContractList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/contracts/new"
-            element={<ContractCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+                <ContractCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/contracts/edit/:id"
-            element={<ContractEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+                <ContractEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/contracts/:id"
-            element={<ContractDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Sales Manager", "Booking Staff"]}>
+                <ContractDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Travel Schedules */}
           <Route
             path="/travel-schedules"
-            element={<TravelScheduleList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
+                <TravelScheduleList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/travel-schedules/new"
-            element={<TravelScheduleCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
+                <TravelScheduleCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/travel-schedules/edit/:id"
-            element={<TravelScheduleEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
+                <TravelScheduleEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/travel-schedules/:id"
-            element={<TravelScheduleDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator"]}>
+                <TravelScheduleDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Materials */}
           <Route
             path="/materials"
-            element={<MaterialList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/materials/new"
-            element={<MaterialCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/materials/edit/:id"
-            element={<MaterialEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/materials/:id"
-            element={<MaterialDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Material Requests */}
           <Route
             path="/material-requests"
-            element={<MaterialRequestList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+                <MaterialRequestList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/material-requests/new"
-            element={<MaterialRequestCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+                <MaterialRequestCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/material-requests/edit/:id"
-            element={<MaterialRequestEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+                <MaterialRequestEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/material-requests/:id"
-            element={<MaterialRequestDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff"]}>
+                <MaterialRequestDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Material Shipments */}
           <Route
             path="/material-shipments"
-            element={<MaterialShipmentList />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialShipmentList />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/material-shipments/new"
-            element={<MaterialShipmentCreate />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialShipmentCreate />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/material-shipments/edit/:id"
-            element={<MaterialShipmentEdit />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialShipmentEdit />
+              </RoleGuard>
+            }
           />
 
           <Route
             path="/material-shipments/:id"
-            element={<MaterialShipmentDetail />}
+            element={
+              <RoleGuard allowedRoles={["Admin", "Materials Handling Staff", "Logistics Coordinator"]}>
+                <MaterialShipmentDetail />
+              </RoleGuard>
+            }
           />
 
           {/* Notifications */}
@@ -277,7 +407,11 @@ function App() {
           {/* Audit Logs */}
           <Route
             path="/audit-logs"
-            element={<AuditLogList />}
+            element={
+              <RoleGuard allowedRoles={["Admin"]}>
+                <AuditLogList />
+              </RoleGuard>
+            }
           />
 
         </Route>

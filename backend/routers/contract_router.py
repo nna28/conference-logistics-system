@@ -139,7 +139,11 @@ def create_contract(
     contract = Contract(
         workshop_id=request.workshop_id,
         venue_id=request.venue_id,
-        contract_info=request.contract_info
+        sales_manager_id=request.sales_manager_id,
+        status=request.status or "Draft",
+        meeting_rooms=request.meeting_rooms,
+        seating_style=request.seating_style,
+        av_requirements=request.av_requirements,
     )
 
     db.add(contract)

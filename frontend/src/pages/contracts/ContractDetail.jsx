@@ -1,69 +1,91 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
-import BackButton from "../../components/layout/BackButton";
-import PageHeader from "../../components/layout/PageHeader";
+import { useParams, useNavigate } from "react-router-dom";
 
 import contractService from "../../services/contractService";
+import BackButton from "../../components/layout/BackButton";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 export default function ContractDetail() {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [id]);
 
   const loadData = async () => {
     try {
-      const result =
-        await contractService.getOverview(id);
-
+      const result = await contractService.getOverview(id);
       setData(result);
     } catch (error) {
       alert(error.message);
     }
   };
 
-  if (!data) {
-    return <p>Loading...</p>;
-  }
+  if (!data) return <LoadingSpinner />;
+
+  const { contract, workshop, venue } = data;
 
   return (
     <>
       <BackButton />
 
-      <PageHeader
-        title={`Contract #${data.contract.id}`}
-        subtitle="Contract Detail"
-      />
+      <div className="page-header" style={{ marginBottom: "24px" }}>
+        <div className="page-header-left">
+          <p className="page-subtitle">Contract Overview</p>
+          <h1>Contract #{contract.id}</h1>
+        </div>
+        <div className="page-header-actions">
+          <button
+            className="btn btn-outline"
+            onClick={() => navigate(`/contracts/edit/${id}`)}
+          >
+            ✏️ Edit
+          </button>
+        </div>
+      </div>
 
-      <div className="detail-card">
+      <div className="detail-grid">
+        <div className="detail-card">
+          <h3>Contract Info</h3>
+          <div className="detail-field">
+            <span className="detail-field-label">Contract ID</span>
+            <span className="detail-field-value">#{contract.id}</span>
+          </div>
+          <div className="detail-field">
+            <span className="detail-field-label">Status</span>
+            <span className="detail-field-value">
+              <span className={`badge badge-${(contract.status || "pending").toLowerCase()}`}>
+                {contract.status}
+              </span>
+            </span>
+          </div>
+          <div className="detail-field">
+            <span className="detail-field-label">Contract Info</span>
+            <span className="detail-field-value">{contract.contract_info || "—"}</span>
+          </div>
+        </div>
 
-        <p>
-          <strong>Workshop:</strong>{" "}
-          {data.workshop?.workshop_code}
-        </p>
-
-        <p>
-          <strong>Venue:</strong>{" "}
-          {data.venue?.name}
-        </p>
-
-        <p>
-          <strong>Status:</strong>{" "}
-          {data.contract.status}
-        </p>
-
-        <p>
-          <strong>Information:</strong>
-        </p>
-
-        <p>
-          {data.contract.contract_info}
-        </p>
-
+        <div className="detail-card">
+          <h3>Related Info</h3>
+          <div className="detail-field">
+            <span className="detail-field-label">Workshop</span>
+            <span className="detail-field-value">{workshop?.workshop_code || `#${contract.workshop_id}`}</span>
+          </div>
+          <div className="detail-field">
+            <span className="detail-field-label">Workshop Type</span>
+            <span className="detail-field-value">{workshop?.workshop_type || "—"}</span>
+          </div>
+          <div className="detail-field">
+            <span className="detail-field-label">Venue</span>
+            <span className="detail-field-value">{venue?.name || `#${contract.venue_id}`}</span>
+          </div>
+          <div className="detail-field">
+            <span className="detail-field-label">Venue Address</span>
+            <span className="detail-field-value">{venue?.address || "—"}</span>
+          </div>
+        </div>
       </div>
     </>
   );

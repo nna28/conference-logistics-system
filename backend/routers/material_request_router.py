@@ -118,9 +118,10 @@ def create_material_request(
 
     material_request = MaterialRequest(
         workshop_id=request.workshop_id,
-        request_date=request.request_date,
-        delivery_address=request.delivery_address,
-        registered_attendees=request.registered_attendees
+        quantity_needed=request.quantity_needed,
+        packaging_status=request.packaging_status or "Pending",
+        shipping_status=request.shipping_status or "Pending",
+        shipping_date=request.shipping_date,
     )
 
     db.add(material_request)

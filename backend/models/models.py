@@ -4,7 +4,8 @@ from sqlalchemy import (
     String,
     DateTime,
     ForeignKey,
-    Text
+    Text,
+    Boolean
 )
 
 from sqlalchemy.orm import relationship
@@ -24,14 +25,11 @@ class User(Base):
         unique=True
     )
 
-    email = Column(
-        String,
-        unique=True
-    )
-
-    password_hash = Column(String)
+    hashed_password = Column(String)
 
     role = Column(String)
+
+    is_active = Column(Integer, default=1)
 
 
 class Workshop(Base):
@@ -47,17 +45,19 @@ class Workshop(Base):
 
     expected_attendees = Column(Integer)
 
+    city = Column(String)
+
     status = Column(
         String,
         default="Pending"
     )
 
-    consultant_id = Column(
+    trainer_id = Column(
         Integer,
         ForeignKey("users.id")
     )
 
-    consultant = relationship("User")
+    consultant = relationship("User", foreign_keys=[trainer_id])
 
 
 class Venue(Base):
@@ -69,16 +69,15 @@ class Venue(Base):
 
     address = Column(String)
 
-    contact_phone = Column(String)
+    rental_cost = Column(String)
 
-    description = Column(Text)
+    room_type = Column(String)
 
-    sales_manager_id = Column(
-        Integer,
-        ForeignKey("users.id")
-    )
+    equipment_supported = Column(String)
 
-    sales_manager = relationship("User")
+    is_available = Column(Integer, default=1)
+
+    capacity = Column(Integer)
 
 
 class Contract(Base):
@@ -96,16 +95,37 @@ class Contract(Base):
         ForeignKey("venues.id")
     )
 
-    contract_info = Column(Text)
+    sales_manager_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
 
     status = Column(
         String,
         default="Draft"
     )
 
+    created_at = Column(DateTime)
+
+    meeting_rooms = Column(Integer)
+
+    seating_style = Column(String)
+
+    av_requirements = Column(Text)
+
+    revision_notes = Column(Text)
+
+    updated_at = Column(DateTime)
+
+    pending_review_by = Column(String)
+
+    approved_at = Column(DateTime)
+
     workshop = relationship("Workshop")
 
     venue = relationship("Venue")
+
+    sales_manager = relationship("User", foreign_keys=[sales_manager_id])
 
 
 class TravelSchedule(Base):
@@ -138,6 +158,8 @@ class TravelSchedule(Base):
         default="Pending"
     )
 
+    confirmation_file = Column(String)
+
     workshop = relationship("Workshop")
 
     consultant = relationship("User")
@@ -148,9 +170,20 @@ class Material(Base):
 
     id = Column(Integer, primary_key=True)
 
-    material_name = Column(String)
+    workshop_id = Column(
+        Integer,
+        ForeignKey("workshops.id")
+    )
 
-    material_type = Column(String)
+    quantity_needed = Column(Integer)
+
+    packaging_status = Column(String, default="Pending")
+
+    shipping_status = Column(String, default="Pending")
+
+    shipping_date = Column(DateTime)
+
+    workshop = relationship("Workshop")
 
 
 class MaterialRequest(Base):
@@ -163,19 +196,18 @@ class MaterialRequest(Base):
         ForeignKey("workshops.id")
     )
 
-    request_date = Column(DateTime)
+    quantity_needed = Column(Integer)
 
-    delivery_address = Column(String)
+    packaging_status = Column(String, default="Pending")
 
-    registered_attendees = Column(Integer)
+    shipping_status = Column(String, default="Pending")
 
-    status = Column(
-        String,
-        default="Pending"
-    )
+    shipping_date = Column(DateTime)
+
+    created_at = Column(DateTime)
 
     workshop = relationship("Workshop")
-    
+
 
 class MaterialShipment(Base):
     __tablename__ = "material_shipments"
@@ -218,7 +250,12 @@ class Notification(Base):
 
     id = Column(Integer, primary_key=True)
 
-    user_id = Column(
+    sender_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
+
+    receiver_id = Column(
         Integer,
         ForeignKey("users.id")
     )
@@ -228,13 +265,14 @@ class Notification(Base):
     message = Column(Text)
 
     is_read = Column(
-        Integer,
-        default=0
+        Boolean,
+        default=False
     )
 
     created_at = Column(DateTime)
 
-    user = relationship("User")
+    sender = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])
 
 
 class AuditLog(Base):
@@ -250,6 +288,8 @@ class AuditLog(Base):
     action = Column(String)
 
     entity = Column(String)
+
+    entity_id = Column(Integer)
 
     created_at = Column(DateTime)
 

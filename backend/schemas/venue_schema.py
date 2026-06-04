@@ -1,28 +1,36 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class VenueCreate(BaseModel):
     name: str
-    address: str
-    contact_phone: str
-    description: str
-    sales_manager_id: int
+    address: Optional[str] = None
+    rental_cost: Optional[str] = None
+    room_type: Optional[str] = None
+    equipment_supported: Optional[str] = None
+    capacity: Optional[int] = None
+    is_available: Optional[int] = 1
 
 
 class VenueUpdate(BaseModel):
-    name: str | None = None
-    address: str | None = None
-    contact_phone: str | None = None
-    description: str | None = None
+    name: Optional[str] = None
+    address: Optional[str] = None
+    rental_cost: Optional[str] = None
+    room_type: Optional[str] = None
+    equipment_supported: Optional[str] = None
+    capacity: Optional[int] = None
+    is_available: Optional[int] = None
 
 
 class VenueResponse(BaseModel):
     id: int
-    name: str
-    address: str
-    contact_phone: str
-    description: str
-    sales_manager_id: int
+    name: Optional[str] = None
+    address: Optional[str] = None
+    rental_cost: Optional[str] = None
+    room_type: Optional[str] = None
+    equipment_supported: Optional[str] = None
+    capacity: Optional[int] = None
+    is_available: Optional[int] = None
 
     class Config:
         from_attributes = True

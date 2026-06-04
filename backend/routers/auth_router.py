@@ -43,7 +43,7 @@ def login(
 
     if not verify_password(
         request.password,
-        user.password_hash
+        user.hashed_password
     ):
         raise HTTPException(
             status_code=401,

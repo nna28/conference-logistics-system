@@ -10,10 +10,21 @@ def create_audit_log(
     entity
 ):
 
+    entity_name = entity
+    entity_id = 0
+    if " #" in entity:
+        parts = entity.split(" #")
+        entity_name = parts[0]
+        try:
+            entity_id = int(parts[1])
+        except ValueError:
+            pass
+
     log = AuditLog(
         user_id=user_id,
         action=action,
-        entity=entity,
+        entity=entity_name,
+        entity_id=entity_id,
         created_at=datetime.now(timezone.utc)
     )
 

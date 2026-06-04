@@ -3,10 +3,12 @@ from fastapi import Depends
 from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 
 from db.database import get_db
-
-from models.models import Notification
+from models.models import Notification, User
+from core.dependencies import get_current_user
+from schemas.notification_schema import NotificationCreate, NotificationResponse
 
 router = APIRouter(
     prefix="/notifications",
@@ -25,6 +27,26 @@ def get_notifications(
     ).all()
 
 
+@router.post("/", response_model=NotificationResponse)
+def create_notification(
+    request: NotificationCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    notification = Notification(
+        sender_id=current_user.id,
+        receiver_id=request.receiver_id,
+        title=request.title,
+        message=request.message,
+        is_read=False,
+        created_at=datetime.now(timezone.utc)
+    )
+    db.add(notification)
+    db.commit()
+    db.refresh(notification)
+    return notification
+
+
 @router.get("/user/{user_id}")
 def get_user_notifications(
     user_id: int,
@@ -33,7 +55,7 @@ def get_user_notifications(
     return db.query(
         Notification
     ).filter(
-        Notification.user_id == user_id
+        Notification.receiver_id == user_id
     ).order_by(
         Notification.id.desc()
     ).all()
@@ -55,8 +77,7 @@ def mark_as_read(
             status_code=404,
             detail="Notification not found"
         )
-
-    notification.is_read = 1
+    notification.is_read = True
 
     db.commit()
 
