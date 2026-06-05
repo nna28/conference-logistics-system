@@ -44,3 +44,43 @@ Một nền tảng web Full-stack tập trung, được thiết kế nhằm số
 1. Mở terminal, di chuyển vào thư mục `backend`:
    ```bash
    cd backend
+2. Tạo và kích hoạt môi trường ảo (Virtual Environment):
+python -m venv venv
+# Trên Windows:
+venv\Scripts\activate
+# Trên macOS/Linux:
+source venv/bin/activate
+3. Cài đặt các thư viện cần thiết:
+pip install -r requirements.txt
+4. Cấu hình Database:
+Đảm bảo bạn đã thay đổi chuỗi kết nối PostgreSQL trong file db/database.py hoặc .env.
+5. Khởi chạy Server Backend:
+uvicorn main:app --reload
+### Bước 2: Cài đặt và khởi chạy Frontend (React)
+1. Mở một terminal mới (Không dùng chung terminal với backend), di chuyển vào thư mục frontend:
+cd frontend
+2. Cài đặt thư viện:
+npm install
+3. npm run dev
+
+### Cấu trúc Dự án (Folder Structure)
+📦 Logistics-Management-System
+ ┣ 📂 backend
+ ┃ ┣ 📂 core          # Cấu hình bảo mật, JWT, hashing
+ ┃ ┣ 📂 db            # Kết nối Database (Session Local)
+ ┃ ┣ 📂 models        # SQLAlchemy Models (Định nghĩa CSDL)
+ ┃ ┣ 📂 routers       # Các API Endpoints (Auth, Workshops, Users...)
+ ┃ ┣ 📂 schemas       # Pydantic Models (Validate dữ liệu Input/Output)
+ ┃ ┗ 📜 main.py       # File khởi chạy app FastAPI, tích hợp Routers & CORS
+ ┗ 📂 frontend
+   ┣ 📂 src
+   ┃ ┣ 📂 api         # Cấu hình Axios & Interceptors
+   ┃ ┣ 📂 components  # Các UI Components dùng chung (Sidebar, Header...)
+   ┃ ┣ 📂 pages       # Các trang chính (Dashboard, Login, Workshops...)
+   ┃ ┣ 📂 services    # Hàm gọi API cho từng thực thể (workshopService.js...)
+   ┃ ┗ 📜 App.jsx     # Cấu hình Routing (React Router)
+   ┗ 📜 vite.config.js # Cấu hình Vite & Proxy
+
+   ### Nhóm Thực hiện (Contributors)
+   Trần Lê Cương - 23020517
+   Ngô Ngọc Ánh - 22024524
