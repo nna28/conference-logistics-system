@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Background */
+  --bg: #EEF1F8;
+  --bg-secondary: #E8ECF5;
+
+  /* Surface */
+  --surface: #FFFFFF;
+  --surface-hover: #F8F9FF;
+  --surface-active: #F0F2FC;
+
+  /* Sidebar */
+  --sidebar-bg: #FFFFFF;
+  --sidebar-width: 72px;
+  --sidebar-active-bg: #1A1A2E;
+  --sidebar-active-color: #FFFFFF;
+  --sidebar-icon-color: #9BA5B7;
+  --sidebar-icon-hover: #1A1A2E;
+
+  /* Primary */
+  --primary: #1A1A2E;
+  --primary-hover: #2D2D4E;
+
+  /* Accent colors */
+  --orange: #F97316;
+  --orange-light: #FFF4ED;
+  --blue: #4B7BF5;
+  --blue-light: #EEF2FF;
+  --green: #10B981;
+  --green-light: #ECFDF5;
+  --red: #EF4444;
+  --red-light: #FEF2F2;
+  --purple: #8B5CF6;
+  --purple-light: #F5F3FF;
+  --yellow: #F59E0B;
+  --yellow-light: #FFFBEB;
+  --cyan: #06B6D4;
+  --cyan-light: #ECFEFF;
+
+  /* Text */
+  --text-primary: #1A1A2E;
+  --text-secondary: #6B7A94;
+  --text-muted: #A8B3C8;
+  --text-white: #FFFFFF;
+
+  /* Border */
+  --border: #E8EBF4;
+  --border-focus: #4B7BF5;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 4px rgba(26, 26, 46, 0.06);
+  --shadow: 0 2px 12px rgba(26, 26, 46, 0.08);
+  --shadow-md: 0 4px 24px rgba(26, 26, 46, 0.10);
+  --shadow-lg: 0 8px 40px rgba(26, 26, 46, 0.14);
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-md: 20px;
+  --radius-lg: 24px;
+  --radius-pill: 100px;
+
+  /* Transition */
+  --transition: all 0.2s ease;
+  --transition-slow: all 0.3s ease;
+
+  /* Font */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
