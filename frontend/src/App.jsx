@@ -143,7 +143,7 @@ function App() {
           <Route
             path="/workshops"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Training Consultant", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Training Consultant", "Consultant", "Logistics Coordinator"]}>
                 <WorkshopList />
               </RoleGuard>
             }
@@ -170,7 +170,7 @@ function App() {
           <Route
             path="/workshops/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Training Consultant", "Logistics Coordinator"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Training Consultant", "Consultant", "Logistics Coordinator"]}>
                 <WorkshopDetail />
               </RoleGuard>
             }
@@ -254,7 +254,7 @@ function App() {
           <Route
             path="/travel-schedules"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant", "Consultant"]}>
                 <TravelScheduleList />
               </RoleGuard>
             }
@@ -281,7 +281,7 @@ function App() {
           <Route
             path="/travel-schedules/:id"
             element={
-              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant"]}>
+              <RoleGuard allowedRoles={["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant", "Consultant"]}>
                 <TravelScheduleDetail />
               </RoleGuard>
             }

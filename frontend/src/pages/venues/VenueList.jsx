@@ -13,6 +13,8 @@ export default function VenueList() {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
+  const userRole = localStorage.getItem("role") || "";
+
   // Advanced filter state
   const [filters, setFilters] = useState({
     city: "",
@@ -170,54 +172,91 @@ export default function VenueList() {
         )}
       </div>
 
-      <div className="table-card">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Room Type</th>
-              <th>Capacity</th>
-              <th>Rental Cost</th>
-              <th>Available</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={8} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
-                  No venues found
-                </td>
-              </tr>
-            ) : (
-              filtered.map((venue) => (
-                <tr key={venue.id}>
-                  <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{venue.id}</td>
-                  <td style={{ fontWeight: 600 }}>{venue.name}</td>
-                  <td style={{ color: "var(--text-secondary)" }}>{venue.address}</td>
-                  <td>{venue.room_type || "—"}</td>
-                  <td>{venue.capacity ?? "—"}</td>
-                  <td>{venue.rental_cost || "—"}</td>
-                  <td>
-                    <span className={`badge ${venue.is_available ? "badge-confirmed" : "badge-cancelled"}`}>
+      {userRole === "Admin" ? (
+        <div className="admin-venues-grid">
+          {filtered.length === 0 ? (
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+              No venues found
+            </div>
+          ) : (
+            filtered.map((venue) => (
+              <div key={venue.id} className="admin-venue-card">
+                <div className="venue-image-placeholder">
+                  {venue.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="venue-content">
+                  <h3 className="venue-name">{venue.name}</h3>
+                  <p style={{ color: "var(--text-secondary)", fontSize: "13px", marginBottom: "12px", minHeight: "38px" }}>
+                    📍 {venue.address}
+                  </p>
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+                    <span className="venue-capacity">👥 {venue.capacity || 0} seats</span>
+                    <span className={`badge ${venue.is_available ? "badge-approved" : "badge-rejected"}`} style={{ padding: "4px 8px" }}>
                       {venue.is_available ? "Available" : "Unavailable"}
                     </span>
-                  </td>
-                  <td>
-                    <div className="table-actions">
-                      <Link to={`/venues/${venue.id}`} title="View">👁</Link>
-                      <Link to={`/venues/edit/${venue.id}`} title="Edit">✏️</Link>
-                      <button className="delete" onClick={() => setDeleteId(venue.id)} title="Delete">🗑</button>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontWeight: 600, color: "#0ca678" }}>{venue.rental_cost ? `${venue.rental_cost} đ` : "N/A"}</span>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <button className="btn btn-outline btn-sm" onClick={() => navigate(`/venues/${venue.id}`)}>View</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => navigate(`/venues/edit/${venue.id}`)}>Edit</button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="table-card">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Room Type</th>
+                <th>Capacity</th>
+                <th>Rental Cost</th>
+                <th>Available</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                    No venues found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filtered.map((venue) => (
+                  <tr key={venue.id}>
+                    <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{venue.id}</td>
+                    <td style={{ fontWeight: 600 }}>{venue.name}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{venue.address}</td>
+                    <td>{venue.room_type || "—"}</td>
+                    <td>{venue.capacity ?? "—"}</td>
+                    <td>{venue.rental_cost || "—"}</td>
+                    <td>
+                      <span className={`badge ${venue.is_available ? "badge-confirmed" : "badge-cancelled"}`}>
+                        {venue.is_available ? "Available" : "Unavailable"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="table-actions">
+                        <Link to={`/venues/${venue.id}`} title="View">👁</Link>
+                        <Link to={`/venues/edit/${venue.id}`} title="Edit">✏️</Link>
+                        <button className="delete" onClick={() => setDeleteId(venue.id)} title="Delete">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <ConfirmDeleteModal
         open={!!deleteId}

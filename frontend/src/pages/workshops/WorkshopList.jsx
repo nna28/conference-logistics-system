@@ -15,7 +15,7 @@ function WorkshopList() {
   const [deleteId, setDeleteId] = useState(null);
 
   const userRole = localStorage.getItem("role") || "";
-  const canEdit = userRole !== "Training Consultant";
+  const canEdit = userRole !== "Training Consultant" && userRole !== "Consultant";
 
   const loadData = async () => {
     try {
@@ -52,54 +52,88 @@ function WorkshopList() {
         onSearch={setSearch}
       />
 
-      <div className="table-card">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Workshop Code</th>
-              <th>Type</th>
-              <th>Attendees</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
-                  No workshops found
-                </td>
-              </tr>
-            ) : (
-              filtered.map((item) => (
-                <tr key={item.id}>
-                  <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{item.id}</td>
-                  <td style={{ fontWeight: 600 }}>{item.workshop_code}</td>
-                  <td>{item.workshop_type}</td>
-                  <td>{item.expected_attendees}</td>
-                  <td>
-                    <span className={`badge badge-${(item.status || "pending").toLowerCase()}`}>
-                      {item.status}
+      {userRole === "Admin" ? (
+        <div className="admin-workshops-grid">
+          {filtered.length === 0 ? (
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+              No workshops found
+            </div>
+          ) : (
+            filtered.map((item) => (
+              <div key={item.id} className="admin-workshop-card">
+                <span className="workshop-code">CODE: {item.workshop_code || `WS-${item.id}`}</span>
+                <h3 className="workshop-title">{item.workshop_type || "General Workshop"}</h3>
+                <div className="workshop-stats">
+                  <div className="stat-item">
+                    <span className="stat-value">{item.expected_attendees || 0}</span>
+                    <span className="stat-label">Attendees</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-value" style={{ color: "var(--purple)", fontSize: "16px" }}>
+                      {item.status || "PENDING"}
                     </span>
-                  </td>
-                  <td>
-                    <div className="table-actions">
-                      <Link to={`/workshops/${item.id}`} title="View">👁</Link>
-                      {canEdit && (
-                        <>
-                          <Link to={`/workshops/edit/${item.id}`} title="Edit">✏️</Link>
-                          <button className="delete" onClick={() => setDeleteId(item.id)} title="Delete">🗑</button>
-                        </>
-                      )}
-                    </div>
+                    <span className="stat-label">Status</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button className="btn btn-outline btn-sm" onClick={() => navigate(`/workshops/${item.id}`)}>View</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate(`/workshops/edit/${item.id}`)}>Edit</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => setDeleteId(item.id)}>Delete</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="table-card">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Workshop Code</th>
+                <th>Type</th>
+                <th>Attendees</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                    No workshops found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filtered.map((item) => (
+                  <tr key={item.id}>
+                    <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{item.id}</td>
+                    <td style={{ fontWeight: 600 }}>{item.workshop_code}</td>
+                    <td>{item.workshop_type}</td>
+                    <td>{item.expected_attendees}</td>
+                    <td>
+                      <span className={`badge badge-${(item.status || "pending").toLowerCase()}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="table-actions">
+                        <Link to={`/workshops/${item.id}`} title="View">👁</Link>
+                        {canEdit && (
+                          <>
+                            <Link to={`/workshops/edit/${item.id}`} title="Edit">✏️</Link>
+                            <button className="delete" onClick={() => setDeleteId(item.id)} title="Delete">🗑</button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <ConfirmDeleteModal
         open={!!deleteId}

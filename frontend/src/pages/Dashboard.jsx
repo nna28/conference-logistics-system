@@ -75,20 +75,23 @@ export default function Dashboard() {
   }, []);
 
   const loadDashboard = async () => {
-    // 💡 Helper function: Nếu API gọi thành công thì lấy dữ liệu, nếu bị lỗi (403, 500...) thì trả về mảng rỗng []
+    // 1. Lấy role của user hiện tại
+    const userRole = localStorage.getItem("role") || "";
+    
+    // 2. Kiểm tra xem user này có quyền xem kho/shipment không
+    const canViewMaterials = ["Admin", "Materials Handling Staff", "Logistics Coordinator"].includes(userRole);
+
     const fetchSafe = async (promise) => {
       try {
         const data = await promise;
-        // Đảm bảo luôn trả về mảng, đề phòng API trả về null/undefined
         return Array.isArray(data) ? data : []; 
       } catch (error) {
-        console.warn("API call failed (possibly 403 Forbidden):", error.message);
+        console.warn("API call failed:", error.message);
         return []; 
       }
     };
 
     try {
-      // ✅ Bọc tất cả các lời gọi API bằng fetchSafe
       const [
         workshops,
         venues,
@@ -102,7 +105,9 @@ export default function Dashboard() {
         fetchSafe(contractService.getAll()),
         fetchSafe(travelScheduleService.getAll()),
         fetchSafe(materialRequestService.getAll()),
-        fetchSafe(materialShipmentService.getAll()),
+        
+        // 3. ✅ SỬA Ở ĐÂY: Nếu có quyền mới gọi API, không thì trả về mảng rỗng luôn (không phát sinh request mạng)
+        fetchSafe(canViewMaterials ? materialShipmentService.getAll() : Promise.resolve([]))
       ]);
 
       setStats({
@@ -114,7 +119,6 @@ export default function Dashboard() {
         shipments: shipments.length,
       });
 
-      // Lấy 5 item mới nhất để hiển thị ở các bảng Recent
       setRecentWorkshops(workshops.slice(-5).reverse());
       setRecentRequests(requests.slice(-5).reverse());
       setRecentShipments(shipments.slice(-5).reverse());

@@ -195,7 +195,7 @@ const Sidebar = () => {
           <NavItem key={item.to} {...item} />
         ))}
 
-        {["Admin", "Booking Staff", "Training Consultant", "Logistics Coordinator", "Sales Manager"].includes(userRole) && (
+        {["Admin", "Booking Staff", "Training Consultant", "Consultant", "Logistics Coordinator", "Sales Manager"].includes(userRole) && (
           <>
             <div className="sidebar-section-divider" />
             {conferenceItems.map((item) => {
@@ -203,7 +203,7 @@ const Sidebar = () => {
               if (item.to === "/users" && userRole !== "Admin") return null;
               if (item.to === "/contracts" && !["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"].includes(userRole)) return null;
               if (item.to === "/venues" && !["Admin", "Sales Manager", "Booking Staff", "Logistics Coordinator"].includes(userRole)) return null;
-              if (item.to === "/travel-schedules" && !["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant"].includes(userRole)) return null;
+              if (item.to === "/travel-schedules" && !["Admin", "Booking Staff", "Logistics Coordinator", "Training Consultant", "Consultant"].includes(userRole)) return null;
               return <NavItem key={item.to} {...item} />;
             })}
           </>

@@ -38,12 +38,11 @@ export default function MaterialList() {
     }
   };
 
-  // ✅ Đoạn code an toàn (Chống sập 100%)
 const filtered = materials.filter((m) => {
-  const name = m.material_name || "";
-  const type = m.material_type || "";
+  const ws = String(m.workshop_id || "");
+  const status = String(m.packaging_status || "") + String(m.shipping_status || "");
   
-  return `${name} ${type}`.toLowerCase().includes((search || "").toLowerCase());
+  return `${ws} ${status}`.toLowerCase().includes((search || "").toLowerCase());
 });
 
   if (loading) return <LoadingSpinner />;
@@ -65,15 +64,17 @@ const filtered = materials.filter((m) => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Type</th>
+              <th>Workshop</th>
+              <th>Quantity Needed</th>
+              <th>Packaging</th>
+              <th>Shipping</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={4} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
                   No materials found
                 </td>
               </tr>
@@ -81,9 +82,17 @@ const filtered = materials.filter((m) => {
               filtered.map((material) => (
                 <tr key={material.id}>
                   <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{material.id}</td>
-                  <td style={{ fontWeight: 600 }}>{material.material_name}</td>
+                  <td style={{ fontWeight: 600 }}>Workshop #{material.workshop_id}</td>
+                  <td>{material.quantity_needed}</td>
                   <td>
-                    <span className="badge badge-draft">{material.material_type}</span>
+                    <span className={`badge badge-${(material.packaging_status || "pending").toLowerCase()}`}>
+                      {material.packaging_status || "PENDING"}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${(material.shipping_status || "pending").toLowerCase()}`}>
+                      {material.shipping_status || "PENDING"}
+                    </span>
                   </td>
                   <td>
                     <div className="table-actions">

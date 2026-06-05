@@ -56,50 +56,78 @@ export default function UserList() {
         onSearch={setSearch}
       />
 
-      <div className="table-card">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
+      {userRole === "Admin" ? (
+        <div className="admin-users-grid">
+          {filtered.length === 0 ? (
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+              No users found
+            </div>
+          ) : (
+            filtered.map((user) => (
+              <div key={user.id} className="admin-user-card">
+                <div className="user-card-header">
+                  <div className="user-avatar">{user.full_name.charAt(0).toUpperCase()}</div>
+                  <div className="user-info">
+                    <h3>{user.full_name}</h3>
+                    <p>{user.email}</p>
+                  </div>
+                </div>
+                <div className="user-role-badge">{user.role}</div>
+                <div className="user-actions">
+                  <button className="btn btn-outline btn-sm" onClick={() => navigate(`/users/${user.id}`)}>View</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate(`/users/edit/${user.id}`)}>Edit</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => setDeleteId(user.id)}>Delete</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="table-card">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
-                  No users found
-                </td>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              filtered.map((user) => (
-                <tr key={user.id}>
-                  <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{user.id}</td>
-                  <td style={{ fontWeight: 600 }}>{user.full_name}</td>
-                  <td style={{ color: "var(--text-secondary)" }}>{user.username}</td>
-                  <td style={{ color: "var(--text-secondary)" }}>{user.email}</td>
-                  <td>
-                    <span className="badge" style={{ background: "var(--blue-light)", color: "var(--blue)" }}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="table-actions">
-                      <Link to={`/users/${user.id}`} title="View">👁</Link>
-                      <Link to={`/users/edit/${user.id}`} title="Edit">✏️</Link>
-                      <button className="delete" onClick={() => setDeleteId(user.id)} title="Delete">🗑</button>
-                    </div>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                    No users found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filtered.map((user) => (
+                  <tr key={user.id}>
+                    <td style={{ color: "var(--text-muted)", fontSize: "13px" }}>#{user.id}</td>
+                    <td style={{ fontWeight: 600 }}>{user.full_name}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{user.username}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{user.email}</td>
+                    <td>
+                      <span className="badge" style={{ background: "var(--blue-light)", color: "var(--blue)" }}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="table-actions">
+                        <Link to={`/users/${user.id}`} title="View">👁</Link>
+                        <Link to={`/users/edit/${user.id}`} title="Edit">✏️</Link>
+                        <button className="delete" onClick={() => setDeleteId(user.id)} title="Delete">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <ConfirmDeleteModal
         open={!!deleteId}
